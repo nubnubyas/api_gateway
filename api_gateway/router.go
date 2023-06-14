@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cloudwego/api_gateway/api_gateway/biz/middleware"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
@@ -30,7 +31,7 @@ func customizedRegister(r *server.Hertz) {
 }
 
 func registerGateway(r *server.Hertz) {
-	group := r.Group("/gateway")
+	group := r.Group("/gateway").Use(middleware.ProtocolTranslation())
 
 	if handler.SvcMap == nil {
 		handler.SvcMap = make(map[string]genericclient.Client)
