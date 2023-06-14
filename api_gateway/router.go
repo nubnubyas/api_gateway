@@ -12,11 +12,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/kitex/client"
-	"github.com/cloudwego/kitex/client/genericclient"
 	"github.com/cloudwego/kitex/pkg/generic"
-	"github.com/cloudwego/kitex/pkg/transmeta"
-	"github.com/cloudwego/kitex/transport"
 )
 
 // customizeRegister registers customize routers.
@@ -33,46 +29,55 @@ func customizedRegister(r *server.Hertz) {
 func registerGateway(r *server.Hertz) {
 	group := r.Group("/gateway").Use(middleware.ProtocolTranslation())
 
-	if handler.SvcMap == nil {
-		handler.SvcMap = make(map[string]genericclient.Client)
+	if middleware.IdlMap == nil {
+		middleware.IdlMap = make(map[string]generic.DescriptorProvider)
 	}
-	idlPath := "./idl/"
+	idlPath := "../idl/"
 	c, err := os.ReadDir(idlPath)
 	if err != nil {
 		hlog.Fatalf("new thrift file provider failed: %v", err)
 	}
-	nacosResolver, err := resolver.NewDefaultNacosResolver()
-	if err != nil {
-		hlog.Fatalf("err:%v", err)
-	}
+	/*
+		nacosResolver, err := resolver.NewDefaultNacosResolver()
+		if err != nil {
+			hlog.Fatalf("err:%v", err)
+		}
+	*/
 
 	for _, entry := range c {
-		if entry.IsDir() || entry.Name() == "common.thrift" {
-			continue
-		}
-		svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
+		/*
+			if entry.IsDir() || entry.Name() == "common.thrift" {
+				continue
+			}
+		*/
+		if entry.Name() == "sutdent_api.thrift" {
+			svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
 
-		provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)
-		if err != nil {
-			hlog.Fatalf("new thrift file provider failed: %v", err)
-			break
-		}
-		g, err := generic.HTTPThriftGeneric(provider)
-		if err != nil {
-			hlog.Fatal(err)
-		}
-		cli, err := genericclient.NewClient(
-			svcName,
-			g,
-			client.WithResolver(nacosResolver),
-			client.WithTransportProtocol(transport.TTHeader),
-			client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
-		)
-		if err != nil {
-			hlog.Fatal(err)
-		}
+			provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)
+			if err != nil {
+				hlog.Fatalf("new thrift file provider failed: %v", err)
+				break
+			}
+			/*
+				g, err := generic.HTTPThriftGeneric(provider)
+				if err != nil {
+					hlog.Fatal(err)
+				}
+				cli, err := genericclient.NewClient(
+					svcName,
+					g,
+					client.WithResolver(nacosResolver),
+					client.WithTransportProtocol(transport.TTHeader),
+					client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
+				)
+				if err != nil {
+					hlog.Fatal(err)
+				}
+			*/
 
-		handler.SvcMap[svcName] = cli
-		group.POST("/:svc", handler.Gateway)
+			middleware.IdlMap[svcName] = provider
+			//handler.SvcMap[svcName] = cli
+			group.POST("/:svc", middleware.ProtocolTranslation())
+		}
 	}
 }

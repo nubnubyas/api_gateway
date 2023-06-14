@@ -8,19 +8,21 @@ import (
 	"github.com/cloudwego/kitex/pkg/generic"
 )
 
-var IdlMap = make(map[string]string)
+var IdlMap = make(map[string]generic.DescriptorProvider)
 
 func ProtocolTranslation() app.HandlerFunc {
 	return func(c context.Context, ctx *app.RequestContext) {
 		// Parse IDL with Local Files
 		// YOUR_IDL_PATH thrift file path, eg:./idl/example.thrift
 		idlname := ctx.Param("svc")
-		idlpath := IdlMap[idlname]
-		p, err := generic.NewThriftFileProvider(idlpath)
-		if err != nil {
-			panic(err)
-		}
-		g, err := generic.JSONThriftGeneric(p)
+		idlprovider := IdlMap[idlname]
+		/*
+			p, err := generic.NewThriftFileProvider(idlpath)
+			if err != nil {
+				panic(err)
+			}
+		*/
+		g, err := generic.JSONThriftGeneric(idlprovider)
 		if err != nil {
 			panic(err)
 		}
@@ -31,6 +33,10 @@ func ProtocolTranslation() app.HandlerFunc {
 		// 'ExampleMethod' method name must be passed as param
 		resp, err := cli.GenericCall(c, "", "{\"Msg\": \"hello\"}")
 		// resp is a JSON string
-		ctx.JSON(200, resp)
+		if resp != nil {
+			num := 1
+			num++
+		}
+		ctx.JSON(200, "ok")
 	}
 }

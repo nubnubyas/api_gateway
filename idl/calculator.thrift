@@ -12,5 +12,5 @@ struct calculatorResp {
 }
 
 service calculatorService {
-    calculatorResp calculate(1: calculatorReq request) (api.post="calculator/get") 
+    calculatorResp calculate(1: calculatorReq request) (api.post="/calculator/get") 
 }

@@ -23,6 +23,6 @@ struct InsertStudentResponse {
 }
 
 service StudentApi{
-    QueryStudentResponse queryStudent(1: QueryStudentRequest req) (api.get="student/query");
-    InsertStudentResponse insertStudent(1: InsertStudentRequest req) (api.post="student/insert");
+    QueryStudentResponse queryStudent(1: QueryStudentRequest req) (api.get="/student/query");
+    InsertStudentResponse insertStudent(1: InsertStudentRequest req) (api.post="/student/insert");
 }
