@@ -3,8 +3,8 @@
 package router
 
 import (
-	api "github.com/cloudwego/api_gateway/api_gateway/biz/router/api"
-	calculator "github.com/cloudwego/api_gateway/api_gateway/biz/router/calculator"
+	api "github.com/cloudwego/api_gateway/hertz_gateway/biz/router/api"
+	calculator "github.com/cloudwego/api_gateway/hertz_gateway/biz/router/calculator"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

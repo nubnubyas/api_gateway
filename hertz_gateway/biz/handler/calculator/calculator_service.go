@@ -5,7 +5,7 @@ package calculator
 import (
 	"context"
 
-	calculator "github.com/cloudwego/api_gateway/api_gateway/biz/model/calculator"
+	calculator "github.com/cloudwego/api_gateway/hertz_gateway/biz/model/calculator"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )

@@ -5,7 +5,7 @@ package api
 import (
 	"context"
 
-	api "github.com/cloudwego/api_gateway/api_gateway/biz/model/api"
+	api "github.com/cloudwego/api_gateway/hertz_gateway/biz/model/api"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )

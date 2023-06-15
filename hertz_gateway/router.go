@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cloudwego/api_gateway/api_gateway/biz/middleware"
+	"github.com/cloudwego/api_gateway/hertz_gateway/biz/middleware"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"

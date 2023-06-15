@@ -3,7 +3,7 @@
 package api
 
 import (
-	api "github.com/cloudwego/api_gateway/api_gateway/biz/handler/api"
+	api "github.com/cloudwego/api_gateway/hertz_gateway/biz/handler/api"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

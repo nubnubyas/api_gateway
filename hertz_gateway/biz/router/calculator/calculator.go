@@ -3,7 +3,7 @@
 package calculator
 
 import (
-	calculator "github.com/cloudwego/api_gateway/api_gateway/biz/handler/calculator"
+	calculator "github.com/cloudwego/api_gateway/hertz_gateway/biz/handler/calculator"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
