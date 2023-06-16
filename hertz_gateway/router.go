@@ -8,11 +8,16 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cloudwego/api_gateway/hertz_gateway/biz/handler"
 	"github.com/cloudwego/api_gateway/hertz_gateway/biz/middleware"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/cloudwego/kitex/client"
+	"github.com/cloudwego/kitex/client/genericclient"
 	"github.com/cloudwego/kitex/pkg/generic"
+	"github.com/cloudwego/kitex/pkg/loadbalance"
+	"github.com/kitex-contrib/registry-nacos/resolver"
 )
 
 // customizeRegister registers customize routers.
@@ -21,7 +26,7 @@ func customizedRegister(r *server.Hertz) {
 		c.JSON(http.StatusOK, "api-gateway is running")
 	})
 
-	//registerGateway(r)
+	registerGateway(r)
 
 	// your code ...
 }
@@ -58,26 +63,28 @@ func registerGateway(r *server.Hertz) {
 				hlog.Fatalf("new thrift file provider failed: %v", err)
 				break
 			}
-			/*
-				g, err := generic.HTTPThriftGeneric(provider)
-				if err != nil {
-					hlog.Fatal(err)
-				}
-				cli, err := genericclient.NewClient(
-					svcName,
-					g,
-					client.WithResolver(nacosResolver),
-					client.WithTransportProtocol(transport.TTHeader),
-					client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
-				)
-				if err != nil {
-					hlog.Fatal(err)
-				}
-			*/
+			nacosResolver, err := resolver.NewDefaultNacosResolver()
+			if err != nil {
+				hlog.Fatalf("err:%v", err)
+			}
 
-			middleware.IdlMap[svcName] = provider
-			//handler.SvcMap[svcName] = cli
-			group.POST("/:svc", middleware.ProtocolTranslation())
+			g, err := generic.HTTPThriftGeneric(provider)
+			if err != nil {
+				hlog.Fatal(err)
+			}
+			loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
+			cli, err := genericclient.NewClient(
+				svcName,
+				g,
+				client.WithResolver(nacosResolver),
+				loadbalanceropt,
+			)
+			if err != nil {
+				hlog.Fatal(err)
+			}
+
+			handler.SvcMap[svcName] = cli
+			group.POST("/:svc", handler.Gateway)
 		}
 	}
 }

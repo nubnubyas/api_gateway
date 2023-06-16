@@ -22,7 +22,7 @@ func main() {
 	svr := api.NewServer(
 		&StudentApiImpl{},
 		server.WithRegistry(r),
-		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "payment"}),
+		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "studentManagement"}),
 		server.WithServiceAddr(&net.TCPAddr{Port: 8081}),
 	)
 

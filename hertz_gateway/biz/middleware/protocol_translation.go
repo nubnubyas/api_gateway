@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 
+	"github.com/cloudwego/api_gateway/hertz_gateway/biz/model/api"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/client/genericclient"
@@ -20,6 +21,18 @@ func ProtocolTranslation() app.HandlerFunc {
 			idlname := ctx.Param("svc")
 			idlprovider := IdlMap[idlname]
 		*/
+		var req api.InsertStudentRequest
+		err := ctx.BindAndValidate(&req)
+		if err != nil {
+			ctx.String(400, err.Error())
+			return
+		}
+		reqRpc := &api.InsertStudentRequest{
+			Num:    req.Num,
+			Name:   req.Name,
+			Gender: req.Gender,
+		}
+
 		p, err := generic.NewThriftFileProvider("../idl/student_api.thrift")
 		if err != nil {
 			panic(err)
@@ -28,13 +41,13 @@ func ProtocolTranslation() app.HandlerFunc {
 		if err != nil {
 			panic(err)
 		}
-		opt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
-		cli, err := genericclient.NewClient("gateway_service", g, opt)
+		loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
+		cli, err := genericclient.NewClient("gateway_service", g, loadbalanceropt)
 		if err != nil {
 			panic(err)
 		}
 		// 'ExampleMethod' method name must be passed as param
-		resp, err := cli.GenericCall(c, "", "{\"Msg\": \"hello\"}")
+		resp, err := cli.GenericCall(c, "", reqRpc)
 		if err != nil {
 			panic(err)
 		}
