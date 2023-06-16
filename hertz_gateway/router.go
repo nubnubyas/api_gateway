@@ -21,7 +21,7 @@ func customizedRegister(r *server.Hertz) {
 		c.JSON(http.StatusOK, "api-gateway is running")
 	})
 
-	registerGateway(r)
+	//registerGateway(r)
 
 	// your code ...
 }
