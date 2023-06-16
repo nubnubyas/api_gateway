@@ -4,10 +4,8 @@ package api
 
 import (
 	"context"
-	"fmt"
 
 	api "github.com/cloudwego/api_gateway/hertz_gateway/biz/model/api"
-	svr "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/api"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -24,9 +22,6 @@ func QueryStudent(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(api.QueryStudentResponse)
-	reqRpc := &svr.QueryStudentRequest{
-		Num: fmt.Sprintf("%d", req.Num),
-	}
 
 	c.JSON(consts.StatusOK, resp)
 }

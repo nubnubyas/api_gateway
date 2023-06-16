@@ -55,36 +55,35 @@ func registerGateway(r *server.Hertz) {
 				continue
 			}
 		*/
-		if entry.Name() == "sutdent_api.thrift" {
-			svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
+		svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
 
-			provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)
-			if err != nil {
-				hlog.Fatalf("new thrift file provider failed: %v", err)
-				break
-			}
-			nacosResolver, err := resolver.NewDefaultNacosResolver()
-			if err != nil {
-				hlog.Fatalf("err:%v", err)
-			}
-
-			g, err := generic.HTTPThriftGeneric(provider)
-			if err != nil {
-				hlog.Fatal(err)
-			}
-			loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
-			cli, err := genericclient.NewClient(
-				svcName,
-				g,
-				client.WithResolver(nacosResolver),
-				loadbalanceropt,
-			)
-			if err != nil {
-				hlog.Fatal(err)
-			}
-
-			handler.SvcMap[svcName] = cli
-			group.POST("/:svc", handler.Gateway)
+		provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)
+		if err != nil {
+			hlog.Fatalf("new thrift file provider failed: %v", err)
+			break
 		}
+		nacosResolver, err := resolver.NewDefaultNacosResolver()
+		if err != nil {
+			hlog.Fatalf("err:%v", err)
+		}
+
+		g, err := generic.JSONThriftGeneric(provider)
+		if err != nil {
+			hlog.Fatal(err)
+		}
+
+		loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
+		cli, err := genericclient.NewClient(
+			svcName,
+			g,
+			client.WithResolver(nacosResolver),
+			loadbalanceropt,
+		)
+		if err != nil {
+			hlog.Fatal(err)
+		}
+
+		handler.SvcMap[svcName] = cli
+		group.POST("/:svc", handler.Gateway)
 	}
 }
