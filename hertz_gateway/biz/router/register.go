@@ -3,8 +3,8 @@
 package router
 
 import (
-	api "github.com/cloudwego/api_gateway/hertz_gateway/biz/router/api"
-	calculator "github.com/cloudwego/api_gateway/hertz_gateway/biz/router/calculator"
+	//api "github.com/cloudwego/api_gateway/hertz_gateway/biz/router/api"
+	//calculator "github.com/cloudwego/api_gateway/hertz_gateway/biz/router/calculator"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
@@ -12,7 +12,7 @@ import (
 func GeneratedRegister(r *server.Hertz) {
 	//INSERT_POINT: DO NOT DELETE THIS LINE!
 	
-	api.Register(r)
+	//api.Register(r)
 
-	calculator.Register(r)
+	//calculator.Register(r)
 }
