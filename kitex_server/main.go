@@ -12,22 +12,10 @@ import (
 	"github.com/kitex-contrib/registry-nacos/registry"
 )
 
+// rpc server 1
 func main() {
-	/*
-			sc := []constant.ServerConfig{
-				*constant.NewServerConfig("127.0.0.1", 8081),
-			}
-			cli, err := clients.NewNamingClient(
-				vo.NacosClientParam{
-					ServerConfigs: sc,
-				},
-			)
 
-
-		if err != nil {
-			klog.Fatal(err)
-		}
-	*/
+	// move the instantiation of the nacos client outside so that all rpc servers can use the same registry(?)
 	r, err := registry.NewDefaultNacosRegistry()
 	if err != nil {
 		klog.Fatal(err)

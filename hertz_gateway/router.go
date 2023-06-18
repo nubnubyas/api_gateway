@@ -32,27 +32,38 @@ func customizedRegister(r *server.Hertz) {
 }
 
 func registerGateway(r *server.Hertz) {
-	group := r.Group("/gateway").Use(middleware.ProtocolTranslation())
+	// prob can remove the protocol translation middleware here (?)
+	// since it's already implemented below
+	// can add other middlewares in the future (ie. auth, rate limit, etc.)
+	group := r.Group("/")
+	// 		      .Use(middleware.ProtocolTranslation())
 
+	// i think IdlMAP can be removed
 	if middleware.IdlMap == nil {
 		middleware.IdlMap = make(map[string]generic.DescriptorProvider)
 	}
+
 	idlPath := "../idl/"
 	c, err := os.ReadDir(idlPath)
 	if err != nil {
 		hlog.Fatalf("new thrift file provider failed: %v", err)
 	}
+
+	// instantiate a naco resolver
+	// use the same resolver for each new generic client
 	nacosResolver, err := resolver.NewDefaultNacosResolver()
 	if err != nil {
 		hlog.Fatalf("err:%v", err)
 	}
 
+	// generic clients creation
 	for _, entry := range c {
 		/*
 			if entry.IsDir() || entry.Name() == "common.thrift" {
 				continue
 			}
 		*/
+		// handle for all .thrift files
 		if entry.Name() == "student_api.thrift" {
 			svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
 
@@ -68,6 +79,7 @@ func registerGateway(r *server.Hertz) {
 			}
 
 			loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
+			// creates new generic client for each IDL
 			cli, err := genericclient.NewClient(
 				svcName,
 				g,
@@ -78,8 +90,10 @@ func registerGateway(r *server.Hertz) {
 				hlog.Fatal(err)
 			}
 
+			// maps service to client
 			handler.SvcMap[svcName] = cli
-			group.POST("/:svc", handler.Gateway)
+			// changed it to "/" to test if it'll work for all paths
+			group.Any("{any}", handler.Gateway)
 		}
 	}
 }
