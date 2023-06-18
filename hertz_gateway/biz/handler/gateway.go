@@ -1,52 +1,69 @@
 package handler
 
 import (
-	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
+
+	// "io/ioutil"
 	"net/http"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/kitex/client/genericclient"
-	"github.com/cloudwego/kitex/pkg/generic"
 )
 
-type requiredParams struct {
-	Method    string `form:"method,required" json:"method"`
-	BizParams string `form:"biz_params,required" json:"biz_params"`
-}
+// type requiredParams struct {
+// 	Method    string `form:"method,required" json:"method"`
+// 	BizParams string `form:"biz_params,required" json:"biz_params"`
+// }
 
 var SvcMap = make(map[string]genericclient.Client)
 
 // Gateway handle the request with the query path of prefix `/gateway`.
 func Gateway(ctx context.Context, c *app.RequestContext) {
+	// ie student api, calculator
 	svcName := c.Param("svc")
+	print(svcName + "\n")
+	fmt.Printf("%v\n", c.Request.Body())
+	// print("reached here\n")
+	// if true {
+	// 	c.JSON(http.StatusOK, "reached here")
+	// 	return
+	// }
+	// print(c + "\n")
+	// retrieve the correct client from SvcMap
 	cli, ok := SvcMap[svcName]
 	if !ok {
-		c.JSON(http.StatusOK, ok)
+		c.JSON(http.StatusOK, "error gateway.go line 33")
 		return
 	}
-	var params requiredParams
-	if err := c.BindAndValidate(&params); err != nil {
+	// var params requiredParams
+	// if err := c.BindAndValidate(&params); err != nil {
+	// 	hlog.Error(err)
+	// 	c.JSON(http.StatusOK, ok)
+	// 	return
+	// }
+
+	// Parse the raw bytes into a generic map
+	var data map[string]interface{}
+	err := json.Unmarshal(c.Request.Body(), &data)
+	if err != nil {
 		hlog.Error(err)
-		c.JSON(http.StatusOK, ok)
+		c.JSON(http.StatusOK, "error at line 52")
 		return
 	}
 
-	req, err := http.NewRequest(http.MethodPost, "", bytes.NewBuffer([]byte(params.BizParams)))
-	if err != nil {
-		hlog.Warnf("new http request failed: %v", err)
-		c.JSON(http.StatusOK, ok)
-		return
-	}
+	// Read the request body into a byte slice
+	// data, err := ioutil.ReadAll(c.Request.rawBody)
+	// if err != nil {
+	// 	// Handle the error
+	// 	hlog.Error(err)
+	// 	c.JSON(http.StatusOK, "error at line 60")
+	// 	return
+	// }
 
-	customReq, err := generic.FromHTTPRequest(req)
-	if err != nil {
-		hlog.Errorf("convert request failed: %v", err)
-		c.JSON(http.StatusOK, ok)
-		return
-	}
-	resp, err := cli.GenericCall(ctx, "", customReq)
+	resp, err := cli.GenericCall(ctx, "InsertStudent", data)
 	if err != nil {
 		panic(err)
 	}

@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/cloudwego/api_gateway/hertz_gateway/biz/handler"
+	// "github.com/cloudwego/api_gateway/hertz_gateway/biz/handler/api"
 	"github.com/cloudwego/api_gateway/hertz_gateway/biz/middleware"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -26,6 +27,7 @@ func customizedRegister(r *server.Hertz) {
 		c.JSON(http.StatusOK, "api-gateway is running")
 	})
 
+	print("customizedRegister\n")
 	registerGateway(r)
 
 	// your code ...
@@ -36,6 +38,9 @@ func registerGateway(r *server.Hertz) {
 	// since it's already implemented below
 	// can add other middlewares in the future (ie. auth, rate limit, etc.)
 	group := r.Group("/")
+	{
+		group.Any("/:svc", handler.Gateway)
+	}
 	// 		      .Use(middleware.ProtocolTranslation())
 
 	// i think IdlMAP can be removed
@@ -64,36 +69,35 @@ func registerGateway(r *server.Hertz) {
 			}
 		*/
 		// handle for all .thrift files
-		if entry.Name() == "student_api.thrift" {
-			svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
+		// if entry.Name() == "student_api.thrift" {
+		svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
 
-			provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)
-			if err != nil {
-				hlog.Fatalf("new thrift file provider failed: %v", err)
-				break
-			}
-
-			g, err := generic.JSONThriftGeneric(provider)
-			if err != nil {
-				hlog.Fatal(err)
-			}
-
-			loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
-			// creates new generic client for each IDL
-			cli, err := genericclient.NewClient(
-				svcName,
-				g,
-				client.WithResolver(nacosResolver),
-				loadbalanceropt,
-			)
-			if err != nil {
-				hlog.Fatal(err)
-			}
-
-			// maps service to client
-			handler.SvcMap[svcName] = cli
-			// changed it to "/" to test if it'll work for all paths
-			group.Any("{any}", handler.Gateway)
+		provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)
+		if err != nil {
+			hlog.Fatalf("new thrift file provider failed: %v", err)
+			break
 		}
+
+		g, err := generic.JSONThriftGeneric(provider)
+		if err != nil {
+			hlog.Fatal(err)
+		}
+
+		loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
+		// creates new generic client for each IDL
+		cli, err := genericclient.NewClient(
+			svcName,
+			g,
+			client.WithResolver(nacosResolver),
+			loadbalanceropt,
+		)
+		if err != nil {
+			hlog.Fatal(err)
+		}
+
+		// maps service to client
+		handler.SvcMap[svcName] = cli
 	}
+
+	print("registered gateway\n")
 }
