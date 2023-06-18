@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/cloudwego/api_gateway/hertz_gateway/biz/handler"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
@@ -26,36 +27,48 @@ func customizedRegister(r *server.Hertz) {
 		c.JSON(http.StatusOK, "api-gateway is running")
 	})
 
+	print("customizedRegister\n")
 	registerGateway(r)
 
 	// your code ...
 }
 
 func registerGateway(r *server.Hertz) {
-	group := r.Group("/gateway")
+	// prob can remove the protocol translation middleware here (?)
+	// since it's already implemented below
+	// can add other middlewares in the future (ie. auth, rate limit, etc.)
+	group := r.Group("/")
 	{
 		group.Any("/:svc", handler.Gateway)
 	}
+	// 		      .Use(middleware.ProtocolTranslation())
 
 	if handler.SvcMap == nil {
 		handler.SvcMap = make(map[string]genericclient.Client)
 	}
+
 	idlPath := "../idl/"
 	c, err := os.ReadDir(idlPath)
 	if err != nil {
 		hlog.Fatalf("new thrift file provider failed: %v", err)
 	}
+
+	// instantiate a naco resolver
+	// use the same resolver for each new generic client
 	nacosResolver, err := resolver.NewDefaultNacosResolver()
 	if err != nil {
 		hlog.Fatalf("err:%v", err)
 	}
 
+	// generic clients creation
 	for _, entry := range c {
 		/*
 			if entry.IsDir() || entry.Name() == "common.thrift" {
 				continue
 			}
 		*/
+		// handle for all .thrift files
+		// if entry.Name() == "student_api.thrift" {
 		svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
 
 		provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)
@@ -70,6 +83,7 @@ func registerGateway(r *server.Hertz) {
 		}
 
 		loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
+		// creates new generic client for each IDL
 		cli, err := genericclient.NewClient(
 			svcName,
 			g,
@@ -84,4 +98,6 @@ func registerGateway(r *server.Hertz) {
 		//group.POST("/:svc", handler.Gateway)
 		fmt.Println(svcName)
 	}
+
+	print("registered gateway\n")
 }

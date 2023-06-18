@@ -11,6 +11,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/loadbalance"
 )
 
+// i think IdlMAP can be removed
 var IdlMap = make(map[string]generic.DescriptorProvider)
 
 func ProtocolTranslation() app.HandlerFunc {
@@ -27,6 +28,8 @@ func ProtocolTranslation() app.HandlerFunc {
 			ctx.String(400, err.Error())
 			return
 		}
+
+		// to comment out
 		reqRpc := &api.InsertStudentRequest{
 			Num:    req.Num,
 			Name:   req.Name,
