@@ -4,12 +4,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/cloudwego/api_gateway/hertz_gateway/biz/handler"
-	"github.com/cloudwego/api_gateway/hertz_gateway/biz/middleware"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
@@ -32,10 +32,13 @@ func customizedRegister(r *server.Hertz) {
 }
 
 func registerGateway(r *server.Hertz) {
-	group := r.Group("/gateway").Use(middleware.ProtocolTranslation())
+	group := r.Group("/gateway")
+	{
+		group.Any("/:svc", handler.Gateway)
+	}
 
-	if middleware.IdlMap == nil {
-		middleware.IdlMap = make(map[string]generic.DescriptorProvider)
+	if handler.SvcMap == nil {
+		handler.SvcMap = make(map[string]genericclient.Client)
 	}
 	idlPath := "../idl/"
 	c, err := os.ReadDir(idlPath)
@@ -53,33 +56,32 @@ func registerGateway(r *server.Hertz) {
 				continue
 			}
 		*/
-		if entry.Name() == "student_api.thrift" {
-			svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
+		svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
 
-			provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)
-			if err != nil {
-				hlog.Fatalf("new thrift file provider failed: %v", err)
-				break
-			}
-
-			g, err := generic.JSONThriftGeneric(provider)
-			if err != nil {
-				hlog.Fatal(err)
-			}
-
-			loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
-			cli, err := genericclient.NewClient(
-				svcName,
-				g,
-				client.WithResolver(nacosResolver),
-				loadbalanceropt,
-			)
-			if err != nil {
-				hlog.Fatal(err)
-			}
-
-			handler.SvcMap[svcName] = cli
-			group.POST("/:svc", handler.Gateway)
+		provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)
+		if err != nil {
+			hlog.Fatalf("new thrift file provider failed: %v", err)
+			break
 		}
+
+		g, err := generic.JSONThriftGeneric(provider)
+		if err != nil {
+			hlog.Fatal(err)
+		}
+
+		loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
+		cli, err := genericclient.NewClient(
+			svcName,
+			g,
+			client.WithResolver(nacosResolver),
+			loadbalanceropt,
+		)
+		if err != nil {
+			hlog.Fatal(err)
+		}
+
+		handler.SvcMap[svcName] = cli
+		//group.POST("/:svc", handler.Gateway)
+		fmt.Println(svcName)
 	}
 }
