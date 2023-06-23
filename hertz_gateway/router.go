@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/cloudwego/api_gateway/hertz_gateway/biz/handler"
-	"github.com/kitex-contrib/registry-nacos/resolver"
+	registerCenter "github.com/cloudwego/api_gateway/register_center/shared"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -50,8 +50,7 @@ func registerGateway(r *server.Hertz) {
 	}
 
 	// same resolver for all generic clients
-	nacosResolver, err := resolver.NewDefaultNacosResolver()
-	if err != nil {
+	if registerCenter.ErrResolver != nil {
 		hlog.Fatalf("err:%v", err)
 	}
 
@@ -75,7 +74,7 @@ func registerGateway(r *server.Hertz) {
 		cli, err := genericclient.NewClient(
 			svcName,
 			g,
-			client.WithResolver(nacosResolver),
+			client.WithResolver(registerCenter.NacosResolver),
 			loadbalanceropt,
 		)
 		if err != nil {
