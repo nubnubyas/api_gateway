@@ -4,7 +4,7 @@ package studentapi
 
 import (
 	"context"
-	api "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/api"
+	api "github.com/cloudwego/api_gateway/kitex_server/kitex_server_1/kitex_gen/api"
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
 )

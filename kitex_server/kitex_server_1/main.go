@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	api "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/api/studentapi"
+	api "github.com/cloudwego/api_gateway/kitex_server/kitex_server_1/kitex_gen/api/studentapi"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/kitex-contrib/registry-nacos/registry"
@@ -12,7 +12,7 @@ import (
 	"github.com/cloudwego/kitex/server"
 )
 
-// rpc server 1
+// rpc server 1 port:8081
 func main() {
 
 	r, err := registry.NewDefaultNacosRegistry()

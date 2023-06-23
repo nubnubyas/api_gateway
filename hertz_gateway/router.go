@@ -49,6 +49,7 @@ func registerGateway(r *server.Hertz) {
 		hlog.Fatalf("new thrift file provider failed: %v", err)
 	}
 
+	// same resolver for all generic clients
 	nacosResolver, err := resolver.NewDefaultNacosResolver()
 	if err != nil {
 		hlog.Fatalf("err:%v", err)
