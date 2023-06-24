@@ -56,6 +56,7 @@ func registerGateway(r *server.Hertz) {
 
 	// generic clients creation
 	for _, entry := range c {
+
 		svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
 
 		provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)

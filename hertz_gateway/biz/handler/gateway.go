@@ -15,6 +15,8 @@ var SvcMap = make(map[string]genericclient.Client)
 
 // input the service name and method name into nested map,
 // gets the method name in the generic client
+//var PathToMethod = make(map[string]map[string]string)
+
 var pathToMethod = map[string]map[string]string{
 	"student_api": {
 		"query":  "queryStudent",
