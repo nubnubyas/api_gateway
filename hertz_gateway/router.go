@@ -25,28 +25,23 @@ import (
 // customizeRegister registers customize routers.
 func customizedRegister(r *server.Hertz) {
 	r.GET("/", func(ctx context.Context, c *app.RequestContext) {
-		c.JSON(http.StatusOK, "api-gateway is running")
+		registerIDLs(r)
+		c.JSON(http.StatusOK, "api-gateway is updated and running ... ")
 	})
 
 	print("customizedRegister\n")
 	registerGateway(r)
-
-	// your code ...
 }
 
-func registerGateway(r *server.Hertz) {
-	group := r.Group("/")
-	{
-		group.Any("/:svc/:method", handler.Gateway)
-	}
+// to update the IDL mapping
+func registerIDLs(r *server.Hertz) {
+	// if handler.SvcMap == nil {
+	handler.SvcMap = make(map[string]genericclient.Client)
+	// }
 
-	if handler.SvcMap == nil {
-		handler.SvcMap = make(map[string]genericclient.Client)
-	}
-
-	if handler.PathToMethod == nil {
-		handler.PathToMethod = make(map[string]map[string]string)
-	}
+	// if handler.PathToMethod == nil {
+	handler.PathToMethod = make(map[string]map[string]string)
+	// }
 
 	idlPath := "../idl/"
 	c, err := os.ReadDir(idlPath)
@@ -123,6 +118,16 @@ func registerGateway(r *server.Hertz) {
 		handler.SvcMap[svcName] = cli
 		fmt.Println(svcName)
 	}
+}
+
+// to register and establish routing for gateway
+func registerGateway(r *server.Hertz) {
+	group := r.Group("/")
+	{
+		group.Any("/:svc/:method", handler.Gateway)
+	}
+
+	registerIDLs(r)
 
 	print("registered gateway\n")
 }

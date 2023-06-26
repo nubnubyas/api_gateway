@@ -22,11 +22,8 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 	svcName := c.Param("svc")
 	method := c.Param("method")
 	fmt.Printf("%v\n", string(c.Request.Body()))
-	path1 := svcName + "/" + method
-	print(path1 + "\n")
-	path := c.Request.URI().RequestURI()
-	println(string(path))
-	methodName := PathToMethod[svcName][path1]
+	path := svcName + "/" + method
+	methodName := PathToMethod[svcName][path]
 
 	// get generic client through service name
 	cli, ok := SvcMap[svcName]
