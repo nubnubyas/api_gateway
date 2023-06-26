@@ -16,6 +16,7 @@ require (
 	github.com/andeya/goutil v1.0.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/go-errors/errors v1.0.1 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/nacos-group/nacos-sdk-go v1.1.4 // indirect
@@ -30,7 +31,6 @@ require (
 )
 
 require (
-	github.com/bufbuild/protocompile v0.5.1
 	github.com/bytedance/go-tagexpr/v2 v2.9.6 // indirect
 	github.com/bytedance/gopkg v0.0.0-20230531144706-a12972768317 // indirect
 	github.com/bytedance/sonic v1.8.8 // indirect
@@ -41,7 +41,7 @@ require (
 	github.com/cloudwego/fastpb v0.0.4 // indirect
 	github.com/cloudwego/frugal v0.1.6 // indirect
 	github.com/cloudwego/netpoll v0.4.0 // indirect
-	github.com/cloudwego/thriftgo v0.2.11 // indirect
+	github.com/cloudwego/thriftgo v0.2.12 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/pprof v0.0.0-20220608213341-c488b8fa1db3 // indirect
