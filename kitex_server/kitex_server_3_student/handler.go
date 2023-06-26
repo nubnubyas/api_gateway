@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	api "github.com/cloudwego/api_gateway/kitex_server/kitex_server_1/kitex_gen/api"
+	api "github.com/cloudwego/api_gateway/kitex_server/kitex_server_3_student/kitex_gen/api"
 )
 
 // StudentApiImpl implements the last service interface defined in the IDL.

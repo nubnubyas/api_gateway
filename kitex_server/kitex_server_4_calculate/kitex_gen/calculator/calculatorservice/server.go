@@ -2,7 +2,7 @@
 package calculatorservice
 
 import (
-	calculator "github.com/cloudwego/api_gateway/kitex_server/kitex_server_2/kitex_gen/calculator"
+	calculator "github.com/cloudwego/api_gateway/kitex_server/kitex_server_4_calculate/kitex_gen/calculator"
 	server "github.com/cloudwego/kitex/server"
 )
 

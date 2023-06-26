@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	calculator "github.com/cloudwego/api_gateway/kitex_server/kitex_server_2/kitex_gen/calculator"
+	calculator "github.com/cloudwego/api_gateway/kitex_server/kitex_server_2_calculate/kitex_gen/calculator"
 )
 
 type CalculatorApiImpl struct{}
