@@ -14,8 +14,7 @@ import (
 
 // rpc server 2 port:8082
 func main() {
-	// might need to move this out (under kitex_server)
-
+	
 	if registerCenter.ErrRegistry != nil {
 		klog.Fatal(registerCenter.ErrRegistry)
 	}
