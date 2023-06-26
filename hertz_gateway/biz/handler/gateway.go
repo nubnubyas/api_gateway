@@ -15,8 +15,9 @@ var SvcMap = make(map[string]genericclient.Client)
 
 // input the service name and method name into nested map,
 // gets the method name in the generic client
-//var PathToMethod = make(map[string]map[string]string)
+var PathToMethod = make(map[string]map[string]string)
 
+/*
 var pathToMethod = map[string]map[string]string{
 	"student_api": {
 		"query":  "queryStudent",
@@ -26,6 +27,7 @@ var pathToMethod = map[string]map[string]string{
 		"get": "calculate",
 	},
 }
+*/
 
 // Gateway handle the request with the query path of prefix `/gateway`.
 func Gateway(ctx context.Context, c *app.RequestContext) {
@@ -33,7 +35,7 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 	svcName := c.Param("svc")
 	method := c.Param("method")
 	fmt.Printf("%v\n", string(c.Request.Body()))
-	methodName := pathToMethod[svcName][method]
+	methodName := PathToMethod[svcName][method]
 
 	// get generic client
 	cli, ok := SvcMap[svcName]

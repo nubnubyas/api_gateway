@@ -11,6 +11,7 @@ import (
 
 	"github.com/cloudwego/api_gateway/hertz_gateway/biz/handler"
 	registerCenter "github.com/cloudwego/api_gateway/register_center/shared"
+	"github.com/cloudwego/thriftgo/parser"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -43,6 +44,10 @@ func registerGateway(r *server.Hertz) {
 		handler.SvcMap = make(map[string]genericclient.Client)
 	}
 
+	if handler.PathToMethod == nil {
+		handler.PathToMethod = make(map[string]map[string]string)
+	}
+
 	idlPath := "../idl/"
 	c, err := os.ReadDir(idlPath)
 	if err != nil {
@@ -58,6 +63,39 @@ func registerGateway(r *server.Hertz) {
 	for _, entry := range c {
 
 		svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
+
+		filePath := idlPath + entry.Name()
+
+		fileSyntax, err := parser.ParseFile(filePath, nil, false)
+		if err != nil {
+			hlog.Fatalf("parse file failed: %v", err)
+			break
+		}
+
+		fileSyntax.ForEachService(func(v *parser.Service) bool {
+			v.ForEachFunction(func(v *parser.Function) bool {
+				functionName := v.Name
+				if handler.PathToMethod[svcName] == nil {
+					handler.PathToMethod[svcName] = make(map[string]string)
+				}
+
+				switch {
+				case len(v.Annotations.Get("api.get")) > 0:
+					Subpath := methodSplit(v.Annotations.Get("api.get"))
+					handler.PathToMethod[svcName][Subpath] = functionName
+				case len(v.Annotations.Get("api.post")) > 0:
+					Subpath := methodSplit(v.Annotations.Get("api.post"))
+					handler.PathToMethod[svcName][Subpath] = functionName
+				default:
+					// Use a default HTTP method type
+				}
+				return true
+			})
+			return true
+		})
+
+		//print out the mapping
+		fmt.Println(handler.PathToMethod)
 
 		provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)
 		if err != nil {
@@ -87,4 +125,11 @@ func registerGateway(r *server.Hertz) {
 	}
 
 	print("registered gateway\n")
+}
+
+func methodSplit(pathName []string) string {
+	path := pathName[0]
+	parts := strings.Split(path, "/")
+	subpath := strings.Join(parts[1:], "/")
+	return subpath
 }
