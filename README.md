@@ -26,7 +26,8 @@ This project depends on the following packages:
 
 Cloudwego Hertz  
 Cloudwego Kitex  
-Cloudwego/Kitex-contrib/Nacos  
+Cloudwego/Kitex-contrib/Nacos
+
 Run ``` go mod tidy ``` in the root directory if required 
 
 ## Usage
@@ -34,26 +35,26 @@ Run ``` go mod tidy ``` in the root directory if required
 Run ```bin\startup.cmd -m standalone``` in the Nacos Directory (you should have installed)
 Access Console on a web browser ```http://localhost:8848/nacos```
 
-2. Start the Hertz Gateway
+3. Start the Hertz Gateway
 Run ```go run .``` in the Hertz gateway directory in a terminal
 
-3. Start the RPC Servers
+4. Start the RPC Servers
 In the respective Kitex_servers directory, run ```go run .``` in a separate terminal.
 Hearbeat/Periodic Status sent to the Nacos Server can be observed in the terminal.
 
-5. Testing by sending HTTP Requests
+6. Testing by sending HTTP Requests
 
-Here's the details of the Example API Service in the repo proviided for testing.
-Format: (path to make request, request method, request body/params expected)
-  a. Student_Api
-    - student_api/queryStudent, GET, [int num]
-    - student_api/insertStudent, POST, [int num, string name, string gender]
-  b. calculator
-    - calculator/get, POST, [string name, int num1, int num2, string operation]
+Here's the details of the Example API Service in the repo proviided for testing.  
+Format: (path to make request, request method, request body/params expected)  
+  a. Student_Api  
+    - student_api/queryStudent, GET, [int num]  
+    - student_api/insertStudent, POST, [int num, string name, string gender]  
+  b. calculator  
+    - calculator/get, POST, [string name, int num1, int num2, string operation]  
 
-Here's an example of how to send a JSON-encoded HTTP request to the API Gateway using cURL:
+Here's an example of how to send a JSON-encoded HTTP request to the API Gateway using cURL:  
 
-```curl -X POST -H "Content-Type: application/json" -d '{"Num":"2","Name":"Ben","Gender":"Male"}' http://localhost:8080/student_api/insert```
+```curl -X POST -H "Content-Type: application/json" -d '{"Num":"2","Name":"Ben","Gender":"Male"}' http://localhost:8080/student_api/insert```  
 This command sends a POST request with a JSON-encoded body containing a num, name and gender field to the API Gateway server running on localhost at port 8080. 
 
 Reference our [![Demo video]](https://drive.google.com/file/d/1fzpVKpczA3NTpi2iYsOFELMmpU3IMR0v/view?usp=sharing) if needed 
