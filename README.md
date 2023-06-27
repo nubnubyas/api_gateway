@@ -1,6 +1,4 @@
-# api_gateway
-Orbital X ByteDance
-# Title of Your Project
+# Orbital X ByteDance Api Gateway
 
 This project is an API Gateway built with the Cloudwego Hertz server, Kitex client and RPC servers, external databases for RPC servers and Nacos registry for service registration and discovery. It allows clients to send JSON-encoded HTTP requests, which are then translated to Thrift binary format and forwarded to the appropriate RPC backend server using Kitex's Generic-Call mechanism. 
 
@@ -45,14 +43,20 @@ Hearbeat/Periodic Status sent to the Nacos Server can be observed in the termina
 
 5. Testing by sending HTTP Requests
 
-Herre's the details of the 
+Here's the details of the Example API Service in the repo proviided for testing.
+Format: (path to make request, request method, request body/params expected)
+  a. Student_Api
+    - student_api/queryStudent, GET, [int num]
+    - student_api/insertStudent, POST, [int num, string name, string gender]
+  b. calculator
+    - calculator/get, POST, [string name, int num1, int num2, string operation]
 
 Here's an example of how to send a JSON-encoded HTTP request to the API Gateway using cURL:
 
 ```curl -X POST -H "Content-Type: application/json" -d '{"Num":"2","Name":"Ben","Gender":"Male"}' http://localhost:8080/student_api/insert```
 This command sends a POST request with a JSON-encoded body containing a num, name and gender field to the API Gateway server running on localhost at port 8080. 
 
-Reference our [![Demo video](https://drive.google.com/file/d/1fzpVKpczA3NTpi2iYsOFELMmpU3IMR0v/view?usp=sharing) if needed 
+Reference our [![Demo video]](https://drive.google.com/file/d/1fzpVKpczA3NTpi2iYsOFELMmpU3IMR0v/view?usp=sharing) if needed 
 
 ## Acknowledgements
 
