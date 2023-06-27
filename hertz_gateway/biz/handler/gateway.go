@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"net/http"
@@ -10,6 +9,7 @@ import (
 	"github.com/cloudwego/kitex/client/genericclient"
 )
 
+// SvcMap is a map of service name to generic client
 var SvcMap = make(map[string]genericclient.Client)
 
 // input the service name and method name into nested map,
@@ -18,10 +18,10 @@ var PathToMethod = make(map[string]map[string]string)
 
 // Gateway handle the request with the query path of prefix `/gateway`.
 func Gateway(ctx context.Context, c *app.RequestContext) {
-	// ie student api, calculator
+	// ie student_api, calculator
 	svcName := c.Param("svc")
+	// ie queryStudent, insertStudent, get
 	method := c.Param("method")
-	fmt.Printf("%v\n", string(c.Request.Body()))
 	path := svcName + "/" + method
 	methodName := PathToMethod[svcName][path]
 
@@ -35,7 +35,7 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 	// make generic call to the service with the method name
 	resp, err := cli.GenericCall(ctx, methodName, string(c.Request.Body()))
 	if err != nil {
-		fmt.Println("error here generic call")
+		c.JSON(http.StatusOK, "error here generic call")
 		panic(err)
 	}
 	c.JSON(http.StatusOK, resp)
