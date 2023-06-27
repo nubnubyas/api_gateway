@@ -24,12 +24,9 @@ To get started with this project, follow these steps:
 
 This project depends on the following packages:
 
-Cloudwego Hertz
-
-Cloudwego Kitex
-
-Cloudwego/Kitex-contrib/Nacos
-
+Cloudwego Hertz  
+Cloudwego Kitex  
+Cloudwego/Kitex-contrib/Nacos  
 Run ``` go mod tidy ``` in the root directory if required 
 
 ## Usage
