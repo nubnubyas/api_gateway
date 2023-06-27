@@ -35,13 +35,9 @@ func customizedRegister(r *server.Hertz) {
 
 // to update the IDL mapping
 func registerIDLs(r *server.Hertz) {
-	// if handler.SvcMap == nil {
-	handler.SvcMap = make(map[string]genericclient.Client)
-	// }
 
-	// if handler.PathToMethod == nil {
+	handler.SvcMap = make(map[string]genericclient.Client)
 	handler.PathToMethod = make(map[string]map[string]string)
-	// }
 
 	idlPath := "../idl/"
 	c, err := os.ReadDir(idlPath)
@@ -67,6 +63,7 @@ func registerIDLs(r *server.Hertz) {
 			break
 		}
 
+		// get the method name from the annotation, fill up pathToMethod map
 		fileSyntax.ForEachService(func(v *parser.Service) bool {
 			v.ForEachFunction(func(v *parser.Function) bool {
 				functionName := v.Name
@@ -88,9 +85,6 @@ func registerIDLs(r *server.Hertz) {
 			})
 			return true
 		})
-
-		//print out the mapping
-		fmt.Println(handler.PathToMethod)
 
 		provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)
 		if err != nil {
@@ -132,6 +126,7 @@ func registerGateway(r *server.Hertz) {
 	print("registered gateway\n")
 }
 
+// to split the path name
 func methodSplit(pathName []string) string {
 	path := pathName[0]
 	parts := strings.Split(path, "/")

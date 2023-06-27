@@ -34,7 +34,6 @@ func (s *StudentApiImpl) QueryStudent(ctx context.Context, req *api.QueryStudent
 		Msg:    "Student exist",
 	}
 
-	println(StudentData)
 	return resp, nil
 }
 
