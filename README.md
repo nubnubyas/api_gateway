@@ -44,7 +44,7 @@ Hearbeat/Periodic Status sent to the Nacos Server can be observed in the termina
 
 6. Testing by sending HTTP Requests
 
-Here's the details of the Example API Service in the repo proviided for testing.  
+Here's the details of the Example API Service in the repo provided for testing.  
 Format: (path to make request, request method, request body/params expected)  
   a. Student_Api  
     - student_api/queryStudent, GET, [int num]  
