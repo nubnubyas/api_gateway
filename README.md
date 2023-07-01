@@ -13,11 +13,11 @@ This project is an API Gateway built with the Cloudwego Hertz server, Kitex clie
 
 To get started with this project, follow these steps:
 
-1. Clone the repository to your local machine.
-2. Install the necessary dependencies, such as Go, Hertz, Kitex, and Nacos.
+1. Clone the repository to your local machine. (nacos not included in the repo as of now, please install separately)
+2. Install the necessary dependencies, such as Go, Hertz, Kitex, and Nacos (https://nacos.io/en-us/docs/quick-start.html).
 3. Start the Nacos registry on your machine.
-4. Run the API Gateway server by running the main file of your project.
-5. Send a JSON-encoded HTTP request to the API Gateway using a tool like cURL, Postman or Thunderclient .
+4. Run the API Gateway server by running the main.go file under hertz_gateway folder.
+5. Send a JSON-encoded HTTP request to the API Gateway (host :8080) using a tool like cURL, Postman or Thunderclient .
 6. Check that the response from the API Gateway server is in JSON-encoded HTTP format.
 
 ## Dependencies
