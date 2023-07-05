@@ -3,8 +3,10 @@ package handler
 import (
 	"context"
 
-	"github.com/cloudwego/hertz/pkg/app"
 	"net/http"
+
+	"github.com/cloudwego/hertz/pkg/app"
+
 	// "github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/kitex/client/genericclient"
 )
@@ -38,5 +40,6 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 		c.JSON(http.StatusOK, "error here generic call")
 		panic(err)
 	}
+
 	c.JSON(http.StatusOK, resp)
 }

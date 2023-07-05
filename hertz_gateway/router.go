@@ -26,7 +26,6 @@ import (
 // customizeRegister registers customize routers.
 func customizedRegister(r *server.Hertz) {
 	r.GET("/", func(ctx context.Context, c *app.RequestContext) {
-		registerIDLs(r)
 		c.JSON(http.StatusOK, "api-gateway is updated and running ... ")
 	})
 
@@ -36,6 +35,10 @@ func customizedRegister(r *server.Hertz) {
 
 // to update the IDL mapping
 func registerIDLs(r *server.Hertz) {
+	group := r.Group("/")
+	{
+		group.Any("/:svc/:method", handler.Gateway)
+	}
 
 	handler.SvcMap = make(map[string]genericclient.Client)
 	handler.PathToMethod = make(map[string]map[string]string)
@@ -63,20 +66,6 @@ func registerIDLs(r *server.Hertz) {
 
 	go watchIDLs(idlPath)
 }
-
-// to register and establish routing for gateway
-/*
-func registerGateway(r *server.Hertz) {
-	group := r.Group("/")
-	{
-		group.Any("/:svc/:method", handler.Gateway)
-	}
-
-	registerIDLs(r)
-
-	print("registered gateway\n")
-}
-*/
 
 // to split the path name
 func methodSplit(pathName []string) string {
@@ -147,12 +136,20 @@ func clientCreation(entryName string, idlPath string) error {
 
 	handler.SvcMap[svcName] = cli
 	fmt.Println(svcName)
+	fmt.Println(handler.PathToMethod)
+	fmt.Println(handler.SvcMap)
 	return nil
+}
+
+func clientRemoval(entryName string, idlPath string) {
+	svcName := strings.ReplaceAll(entryName, ".thrift", "")
+	delete(handler.SvcMap, svcName)
+	delete(handler.PathToMethod, svcName)
 }
 
 func watchIDLs(idlPath string) {
 	// Create a channel to signal when a change has been detected
-	changeChan := make(chan string, 5)
+	changeChan := make(chan []string, 5)
 
 	// Start a goroutine to watch for changes in the IDL directory
 	go func() {
@@ -171,10 +168,25 @@ func watchIDLs(idlPath string) {
 		for {
 			select {
 			case event := <-watcher.Events:
-				if event.Op&fsnotify.Write == fsnotify.Write {
+				/*
+					if event.Op&fsnotify.Write == fsnotify.Write {}
+					if event.Op&fsnotify.Rename == fsnotify.Rename {}
+				*/
+				if event.Op&fsnotify.Create == fsnotify.Create {
 					// IDL file has been modified, signal change
+					name := strings.Split(event.Name, "\\")
+					fmt.Println("reached here, create")
 					select {
-					case changeChan <- event.Name:
+					case changeChan <- []string{name[2], "add"}:
+					default:
+					}
+				}
+
+				if event.Op&fsnotify.Remove == fsnotify.Remove {
+					name := strings.Split(event.Name, "\\")
+					fmt.Println("reached here, delete")
+					select {
+					case changeChan <- []string{name[2], "remove"}:
 					default:
 					}
 				}
@@ -184,7 +196,14 @@ func watchIDLs(idlPath string) {
 		}
 	}()
 
-	for fileName := range changeChan {
-		clientCreation(fileName, idlPath)
+	fmt.Println("watchidl")
+
+	for entry := range changeChan {
+		switch entry[1] {
+		case "add":
+			clientCreation(entry[0], idlPath)
+		case "remove":
+			clientRemoval(entry[0], idlPath)
+		}
 	}
 }
