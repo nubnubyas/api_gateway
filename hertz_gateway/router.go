@@ -12,6 +12,7 @@ import (
 	"github.com/cloudwego/api_gateway/hertz_gateway/biz/handler"
 	registerCenter "github.com/cloudwego/api_gateway/register_center/shared"
 	"github.com/cloudwego/thriftgo/parser"
+	"github.com/fsnotify/fsnotify"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -30,7 +31,7 @@ func customizedRegister(r *server.Hertz) {
 	})
 
 	print("customizedRegister\n")
-	registerGateway(r)
+	registerIDLs(r)
 }
 
 // to update the IDL mapping
@@ -53,68 +54,18 @@ func registerIDLs(r *server.Hertz) {
 	// generic clients creation
 	for _, entry := range c {
 
-		svcName := strings.ReplaceAll(entry.Name(), ".thrift", "")
-
-		filePath := idlPath + entry.Name()
-
-		fileSyntax, err := parser.ParseFile(filePath, nil, false)
-		if err != nil {
-			hlog.Fatalf("parse file failed: %v", err)
-			break
-		}
-
-		// get the method name from the annotation, fill up pathToMethod map
-		fileSyntax.ForEachService(func(v *parser.Service) bool {
-			v.ForEachFunction(func(v *parser.Function) bool {
-				functionName := v.Name
-				if handler.PathToMethod[svcName] == nil {
-					handler.PathToMethod[svcName] = make(map[string]string)
-				}
-
-				switch {
-				case len(v.Annotations.Get("api.get")) > 0:
-					Subpath := methodSplit(v.Annotations.Get("api.get"))
-					handler.PathToMethod[svcName][Subpath] = functionName
-				case len(v.Annotations.Get("api.post")) > 0:
-					Subpath := methodSplit(v.Annotations.Get("api.post"))
-					handler.PathToMethod[svcName][Subpath] = functionName
-				default:
-					// Use a default HTTP method type
-				}
-				return true
-			})
-			return true
-		})
-
-		provider, err := generic.NewThriftFileProvider(entry.Name(), idlPath)
-		if err != nil {
-			hlog.Fatalf("new thrift file provider failed: %v", err)
-			break
-		}
-
-		g, err := generic.JSONThriftGeneric(provider)
+		err := clientCreation(entry.Name(), idlPath)
 		if err != nil {
 			hlog.Fatal(err)
+			break
 		}
-
-		loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
-		// creates new generic client for each IDL
-		cli, err := genericclient.NewClient(
-			svcName,
-			g,
-			client.WithResolver(registerCenter.NacosResolver),
-			loadbalanceropt,
-		)
-		if err != nil {
-			hlog.Fatal(err)
-		}
-
-		handler.SvcMap[svcName] = cli
-		fmt.Println(svcName)
 	}
+
+	go watchIDLs(idlPath)
 }
 
 // to register and establish routing for gateway
+/*
 func registerGateway(r *server.Hertz) {
 	group := r.Group("/")
 	{
@@ -125,6 +76,7 @@ func registerGateway(r *server.Hertz) {
 
 	print("registered gateway\n")
 }
+*/
 
 // to split the path name
 func methodSplit(pathName []string) string {
@@ -132,4 +84,107 @@ func methodSplit(pathName []string) string {
 	parts := strings.Split(path, "/")
 	subpath := strings.Join(parts[1:], "/")
 	return subpath
+}
+
+func clientCreation(entryName string, idlPath string) error {
+	svcName := strings.ReplaceAll(entryName, ".thrift", "")
+
+	filePath := idlPath + entryName
+
+	fileSyntax, err := parser.ParseFile(filePath, nil, false)
+	if err != nil {
+		hlog.Fatalf("parse file failed: %v", err)
+		return err
+	}
+
+	// get the method name from the annotation, fill up pathToMethod map
+	fileSyntax.ForEachService(func(v *parser.Service) bool {
+		v.ForEachFunction(func(v *parser.Function) bool {
+			functionName := v.Name
+			if handler.PathToMethod[svcName] == nil {
+				handler.PathToMethod[svcName] = make(map[string]string)
+			}
+
+			switch {
+			case len(v.Annotations.Get("api.get")) > 0:
+				Subpath := methodSplit(v.Annotations.Get("api.get"))
+				handler.PathToMethod[svcName][Subpath] = functionName
+			case len(v.Annotations.Get("api.post")) > 0:
+				Subpath := methodSplit(v.Annotations.Get("api.post"))
+				handler.PathToMethod[svcName][Subpath] = functionName
+			default:
+				// Use a default HTTP method type
+			}
+			return true
+		})
+		return true
+	})
+
+	provider, err := generic.NewThriftFileProvider(entryName, idlPath)
+	if err != nil {
+		hlog.Fatalf("new thrift file provider failed: %v", err)
+		return err
+	}
+
+	g, err := generic.JSONThriftGeneric(provider)
+	if err != nil {
+		hlog.Fatal(err)
+		return err
+	}
+
+	loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
+	// creates new generic client for each IDL
+	cli, err := genericclient.NewClient(
+		svcName,
+		g,
+		client.WithResolver(registerCenter.NacosResolver),
+		loadbalanceropt,
+	)
+	if err != nil {
+		hlog.Fatal(err)
+		return err
+	}
+
+	handler.SvcMap[svcName] = cli
+	fmt.Println(svcName)
+	return nil
+}
+
+func watchIDLs(idlPath string) {
+	// Create a channel to signal when a change has been detected
+	changeChan := make(chan string, 5)
+
+	// Start a goroutine to watch for changes in the IDL directory
+	go func() {
+		watcher, err := fsnotify.NewWatcher()
+		if err != nil {
+			hlog.Fatal(err)
+		}
+		defer watcher.Close()
+
+		// Watch IDL path for changes
+		err = watcher.Add(idlPath)
+		if err != nil {
+			hlog.Fatal(err)
+		}
+
+		for {
+			select {
+			case event := <-watcher.Events:
+				if event.Op&fsnotify.Write == fsnotify.Write {
+					// IDL file has been modified, signal change
+					select {
+					case changeChan <- event.Name:
+					default:
+					}
+				}
+			case err := <-watcher.Errors:
+				hlog.Error(err)
+			}
+		}
+	}()
+
+	for fileName := range changeChan {
+		clientCreation(fileName, idlPath)
+	}
 }

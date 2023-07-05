@@ -9,6 +9,7 @@ require (
 	github.com/cloudwego/hertz v0.6.4
 	github.com/cloudwego/kitex v0.6.0
 	github.com/cloudwego/thriftgo v0.2.12
+	github.com/fsnotify/fsnotify v1.6.0
 	github.com/kitex-contrib/registry-nacos v0.1.0
 )
 
@@ -42,7 +43,6 @@ require (
 	github.com/cloudwego/fastpb v0.0.4 // indirect
 	github.com/cloudwego/frugal v0.1.6 // indirect
 	github.com/cloudwego/netpoll v0.4.0 // indirect
-	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/pprof v0.0.0-20220608213341-c488b8fa1db3 // indirect
 	github.com/henrylee2cn/ameda v1.5.1 // indirect
