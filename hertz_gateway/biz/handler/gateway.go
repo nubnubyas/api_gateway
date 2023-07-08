@@ -26,11 +26,9 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 
 	// verify the if request body is encoded in JSON (only if it is non-GET requests)
 	// GET requests do not have request body (uses query string instead)
-	if string(c.Request.Method()) != "GET" {
-		if !checkJSON(reqBody) {
-			c.JSON(http.StatusOK, "request body is not in JSON format")
-			return
-		}
+	if !checkJSON(reqBody) {
+		c.JSON(http.StatusOK, "request body is not in JSON format")
+		return
 	}
 
 	// ie student_api, calculator

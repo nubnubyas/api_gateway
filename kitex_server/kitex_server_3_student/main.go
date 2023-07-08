@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	api "github.com/cloudwego/api_gateway/kitex_server/kitex_server_3_student/kitex_gen/api/studentapi"
+	api "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/api/studentapi"
 	registerCenter "github.com/cloudwego/api_gateway/register_center/shared"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"

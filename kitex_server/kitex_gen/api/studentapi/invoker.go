@@ -3,7 +3,7 @@
 package studentapi
 
 import (
-	api "github.com/cloudwego/api_gateway/kitex_server/kitex_server_3_student/kitex_gen/api"
+	api "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/api"
 	server "github.com/cloudwego/kitex/server"
 )
 

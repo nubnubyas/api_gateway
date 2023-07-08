@@ -10,6 +10,7 @@ require (
 	github.com/cloudwego/kitex v0.6.0
 	github.com/cloudwego/thriftgo v0.2.12
 	github.com/fsnotify/fsnotify v1.6.0
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/kitex-contrib/registry-nacos v0.1.0
 )
 
