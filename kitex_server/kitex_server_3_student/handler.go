@@ -10,14 +10,6 @@ import (
 // StudentApiImpl implements the last service interface defined in the IDL.
 type StudentApiImpl struct{}
 
-// type StudentInfo struct {
-// 	Num    string
-// 	Name   string
-// 	Gender string
-// }
-
-// var StudentData = make(map[string]StudentInfo, 5)
-
 // QueryStudent implements the StudentApiImpl interface.
 func (s *StudentApiImpl) QueryStudent(ctx context.Context, req *api.QueryStudentRequest) (resp *api.QueryStudentResponse, err error) {
 	// TODO: Your code here...

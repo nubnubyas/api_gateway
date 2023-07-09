@@ -86,37 +86,3 @@ func QueryStudentDB(num string) (*api.QueryStudentResponse, error) {
 	resp.Msg = "Student exists in server 1"
 	return &resp, nil
 }
-
-// // includes sql command to insert a student
-// func InsertStudentDB3(student *api.InsertStudentRequest) error {
-// 	db, err := OpenDatabase()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer db.Close()
-
-// 	_, err = db.Exec("INSERT INTO students (num, name, gender) VALUES (?, ?, ?)", student.Num, student.Name, student.Gender)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
-
-// // includes sql command to query a student
-// func QueryStudentDB3(num string) (*api.QueryStudentResponse, error) {
-// 	db, err := OpenDatabase()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer db.Close()
-
-// 	var resp api3.QueryStudentResponse
-// 	err = db.QueryRow("SELECT num, name, gender FROM students WHERE num = ?", num).Scan(&resp.Num, &resp.Name, &resp.Gender)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	resp.Msg = "Student exists in server 3"
-// 	return &resp, nil
-// }

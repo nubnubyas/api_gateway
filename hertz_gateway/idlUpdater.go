@@ -124,7 +124,7 @@ func watchIDLs(idlPath string) {
 					if event.Op&fsnotify.Write == fsnotify.Write {}
 					if event.Op&fsnotify.Rename == fsnotify.Rename {}
 				*/
-				if event.Op&fsnotify.Create == fsnotify.Create {
+				if event.Op&fsnotify.Create == fsnotify.Create && event.Op&fsnotify.Rename != fsnotify.Rename {
 					// IDL file has been modified, signal change
 					name := strings.Split(event.Name, "\\")
 					fmt.Println("reached here, create")
