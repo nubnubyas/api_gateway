@@ -32,7 +32,7 @@ func (s *StudentApiImpl) InsertStudent(ctx context.Context, req *api.InsertStude
 	if exist {
 		return &api.InsertStudentResponse{
 			Ok:  false,
-			Msg: "the num has exists in server 1",
+			Msg: "the num exists in server 1",
 		}, nil
 	}
 

@@ -4,11 +4,22 @@ import (
 	"database/sql"
 	"fmt"
 
+	// "strconv"
+
 	api "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/api"
+	grader "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/grader"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 // to do : for student_api (add grades into table) and grader_api (get grades from table)
+
+// type Student struct {
+// 	Id     string
+// 	Name   string
+// 	Major  string
+// 	Gender string
+// 	Grades string
+// }
 
 // opens the database and creates the table if it does not exist
 func OpenDatabase() (*sql.DB, error) {
@@ -22,7 +33,9 @@ func OpenDatabase() (*sql.DB, error) {
 			id INT NOT NULL AUTO_INCREMENT,
 			num TEXT NOT NULL,
 			name TEXT NOT NULL,
+			major TEXT NOT NULL,
 			gender TEXT NOT NULL,
+			grades TEXT NULL,
 			PRIMARY KEY (id),
 			UNIQUE KEY num_idx (num(255))
 		);
@@ -43,7 +56,24 @@ func InsertStudentDB(student *api.InsertStudentRequest) error {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO students (num, name, gender) VALUES (?, ?, ?)", student.Id, student.Name, student.Gender)
+	_, err = db.Exec("INSERT INTO students (num, name, gender) VALUES (?, ?, ?)", student.Id, student.Name, student.Major, student.Gender)
+	if err != nil {
+		fmt.Println("Error inserting table:", err)
+		return err
+	}
+
+	return nil
+}
+
+// includes sql command to insert a student
+func InsertGradesDB(req *grader.InsertGradeRequest) error {
+	db, err := OpenDatabase()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	_, err = db.Exec("UPDATE students SET grades = ? WHERE num = ?", req.Grades, fmt.Sprintf("%d", req.StudentId))
 	if err != nil {
 		fmt.Println("Error inserting table:", err)
 		return err
@@ -79,12 +109,29 @@ func QueryStudentDB(num string) (*api.QueryStudentResponse, error) {
 	defer db.Close()
 
 	var resp api.QueryStudentResponse
-	err = db.QueryRow("SELECT num, name, gender FROM students WHERE num = ?", num).Scan(&resp.Id, &resp.Name, &resp.Gender)
+	err = db.QueryRow("SELECT num, name, gender FROM students WHERE num = ?", num).Scan(&resp.Id, &resp.Name, &resp.Major, &resp.Gender)
 	if err != nil {
-		fmt.Println("Error inserting table:", err)
+		fmt.Println("Error Query table:", err)
 		return nil, err
 	}
 
-	resp.Msg = "Student exists in server 1"
 	return &resp, nil
+}
+
+func getGradesDB(id int) (*grader.GetCapResponse, string, error) {
+	db, err := OpenDatabase()
+	if err != nil {
+		return nil, "", err
+	}
+	defer db.Close()
+
+	var resp grader.GetCapResponse
+	var grades string
+	err = db.QueryRow("SELECT num, name, major, gender, grades FROM students WHERE num = ?", fmt.Sprintf("%d", id)).Scan(&resp.Id, &resp.Name, &resp.Major, &resp.Gender, &grades)
+	if err != nil {
+		fmt.Println("Error getting Student:", err)
+		return nil, "", err
+	}
+
+	return &resp, grades, nil
 }
