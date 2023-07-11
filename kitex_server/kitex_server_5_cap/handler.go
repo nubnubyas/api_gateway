@@ -7,6 +7,9 @@ import (
 	calculator "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/calculator"
 	calculatorservice "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/calculator/calculatorservice"
 	grader "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/grader"
+	registerCenter "github.com/cloudwego/api_gateway/register_center/shared"
+	"github.com/cloudwego/kitex/client"
+	"github.com/cloudwego/kitex/pkg/loadbalance"
 )
 
 // UniversityGradesImpl implements the last service interface defined in the IDL.
@@ -37,21 +40,21 @@ func (s *UniversityGradesImpl) GetGrades(ctx context.Context, req *grader.GetCap
 	}
 
 	// Perform the calculation
-	fmt.Println(cap)
 	calReq := new(calculator.CapCalculatorReq)
 	calReq.Num1 = cap
-	fmt.Println(calReq)
-	calcCli, err := calculatorservice.NewClient("calculator")
-	// err : service discovery error: internal exception: no resolver available
+
+	loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
+	calcCli, err := calculatorservice.NewClient("calculator",
+		client.WithResolver(registerCenter.NacosResolver),
+		loadbalanceropt)
 	if err != nil {
 		fmt.Println(err)
-		println("error1")
 		panic(err)
 	}
+	// err : service discovery error: internal exception: no resolver available
 	calResp, err1 := calcCli.CapCalculate(ctx, calReq)
 	if err1 != nil {
 		fmt.Println(err1)
-		println("error2")
 		panic(err1)
 	}
 
