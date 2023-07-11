@@ -4,13 +4,31 @@ import (
 	"context"
 	"fmt"
 
-	calculator "github.com/cloudwego/api_gateway/kitex_server/kitex_server_4_calculate/kitex_gen/calculator"
+	calculator "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/calculator"
 )
 
 type CalculatorApiImpl struct{}
 
 type CalculatorResp struct {
 	Message string `json:"message"`
+}
+
+func (s *CalculatorApiImpl) CapCalculate(ctx context.Context, req *calculator.CapCalculatorReq) (resp *calculator.CapCalculatorResp, err error) {
+
+	// Perform the calculation
+	var result int64
+	gradesList := req.Num1
+
+	for _, grade := range gradesList {
+		result += grade
+	}
+
+	result /= int64(len(gradesList))
+
+	return &calculator.CapCalculatorResp{
+		Message: result,
+	}, nil
+
 }
 
 func (s *CalculatorApiImpl) Calculate(ctx context.Context, req *calculator.CalculatorReq) (resp *calculator.CalculatorResp, err error) {

@@ -1,20 +1,22 @@
 namespace go api
 
 struct QueryStudentRequest {
-    1: string Num (api.query="num", api.vd="$!='0'; msg: 'num cannot be 0'");
+    1: string Id (api.query="id", api.vd="$!='0'; msg: 'id cannot be 0'");
 }
 
 struct QueryStudentResponse {
-    1: string Num;
+    1: string Id;
     2: string Name;
     3: string Gender;
-    4: string Msg;
+    4: string Major;
+    5: string Msg;
 }
 
 struct InsertStudentRequest {
-    1: string Num (api.form="num");
+    1: string Id (api.form="id");
     2: string Name (api.form="name");
-    3: string Gender (api.form="gender");
+    3: string Major (api.form="major");
+    4: string Gender (api.form="gender");
 }
 
 struct InsertStudentResponse {

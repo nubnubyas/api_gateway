@@ -8,6 +8,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// to do : for student_api (add grades into table) and grader_api (get grades from table)
+
 // opens the database and creates the table if it does not exist
 func OpenDatabase() (*sql.DB, error) {
 	db, err := sql.Open("mysql", "sql6631394:jJ5LZYJR18@tcp(sql6.freesqldatabase.com:3306)/sql6631394")
@@ -41,7 +43,7 @@ func InsertStudentDB(student *api.InsertStudentRequest) error {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO students (num, name, gender) VALUES (?, ?, ?)", student.Num, student.Name, student.Gender)
+	_, err = db.Exec("INSERT INTO students (num, name, gender) VALUES (?, ?, ?)", student.Id, student.Name, student.Gender)
 	if err != nil {
 		fmt.Println("Error inserting table:", err)
 		return err
@@ -77,7 +79,7 @@ func QueryStudentDB(num string) (*api.QueryStudentResponse, error) {
 	defer db.Close()
 
 	var resp api.QueryStudentResponse
-	err = db.QueryRow("SELECT num, name, gender FROM students WHERE num = ?", num).Scan(&resp.Num, &resp.Name, &resp.Gender)
+	err = db.QueryRow("SELECT num, name, gender FROM students WHERE num = ?", num).Scan(&resp.Id, &resp.Name, &resp.Gender)
 	if err != nil {
 		fmt.Println("Error inserting table:", err)
 		return nil, err

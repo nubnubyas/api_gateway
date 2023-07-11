@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	calculator "github.com/cloudwego/api_gateway/kitex_server/kitex_server_2_calculate/kitex_gen/calculator/calculatorservice"
+	calculator "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/calculator/calculatorservice"
 	registerCenter "github.com/cloudwego/api_gateway/register_center/shared"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"

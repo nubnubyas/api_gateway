@@ -11,6 +11,17 @@ struct calculatorResp {
     1: string message
 }
 
+struct capCalculatorReq {
+    // change the name of the field to grades
+    1: list<i64> num1 (api.form="grades")
+}
+
+struct capCalculatorResp {
+    1: i64 message
+}
+
 service calculatorService {
     calculatorResp calculate(1: calculatorReq request) (api.post="/calculator/get") 
+    capCalculatorResp capCalculate(1: capCalculatorReq request) (api.post="/calculator/cap") 
+
 }
