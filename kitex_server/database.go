@@ -56,7 +56,7 @@ func InsertStudentDB(student *api.InsertStudentRequest) error {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO students (num, name, gender) VALUES (?, ?, ?)", student.Id, student.Name, student.Major, student.Gender)
+	_, err = db.Exec("INSERT INTO students (num, name, major, gender) VALUES (?, ?, ?, ?)", student.Id, student.Name, student.Major, student.Gender)
 	if err != nil {
 		fmt.Println("Error inserting table:", err)
 		return err
@@ -73,7 +73,11 @@ func InsertGradesDB(req *grader.InsertGradeRequest) error {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("UPDATE students SET grades = ? WHERE num = ?", req.Grades, fmt.Sprintf("%d", req.StudentId))
+	gradeString := ""
+	for _, grade := range req.Grades {
+		gradeString += grade
+	}
+	_, err = db.Exec("UPDATE students SET grades = ? WHERE num = ?", gradeString, fmt.Sprintf("%d", req.StudentId))
 	if err != nil {
 		fmt.Println("Error inserting table:", err)
 		return err
@@ -109,7 +113,7 @@ func QueryStudentDB(num string) (*api.QueryStudentResponse, error) {
 	defer db.Close()
 
 	var resp api.QueryStudentResponse
-	err = db.QueryRow("SELECT num, name, gender FROM students WHERE num = ?", num).Scan(&resp.Id, &resp.Name, &resp.Major, &resp.Gender)
+	err = db.QueryRow("SELECT num, name, major, gender FROM students WHERE num = ?", num).Scan(&resp.Id, &resp.Name, &resp.Major, &resp.Gender)
 	if err != nil {
 		fmt.Println("Error Query table:", err)
 		return nil, err
@@ -118,7 +122,7 @@ func QueryStudentDB(num string) (*api.QueryStudentResponse, error) {
 	return &resp, nil
 }
 
-func getGradesDB(id int) (*grader.GetCapResponse, string, error) {
+func GetGradesDB(id int) (*grader.GetCapResponse, string, error) {
 	db, err := OpenDatabase()
 	if err != nil {
 		return nil, "", err

@@ -23,20 +23,20 @@ func (s *UniversityGradesImpl) GetGrades(ctx context.Context, req *grader.GetCap
 	cap := []int64{}
 	id := int(req.StudentId)
 	// ie. gradesInString := "AAABA"
-	response, gradesInString, _ := database.getGradesDB(id)
+	response, gradesInString, _ := database.GetGradesDB(id)
 	for _, grade := range gradesInString {
 		switch grade {
-		case "A":
+		case 'A':
 			cap = append(cap, 5)
-		case "B":
+		case 'B':
 			cap = append(cap, 4)
-		case "C":
+		case 'C':
 			cap = append(cap, 3)
-		case "D":
+		case 'D':
 			cap = append(cap, 2)
-		case "E":
+		case 'E':
 			cap = append(cap, 1)
-		case "F":
+		case 'F':
 			cap = append(cap, 0)
 		}
 	}
@@ -65,7 +65,7 @@ func (s *UniversityGradesImpl) GetGrades(ctx context.Context, req *grader.GetCap
 	final := calResp.Message
 	response.Cap = float64(final)
 
-	return &response, nil
+	return response, nil
 
 	// resp : &grader.GetCapResponse{
 	// 	Id:     3,
