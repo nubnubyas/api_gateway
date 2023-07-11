@@ -16,14 +16,14 @@ type CalculatorResp struct {
 func (s *CalculatorApiImpl) CapCalculate(ctx context.Context, req *calculator.CapCalculatorReq) (resp *calculator.CapCalculatorResp, err error) {
 
 	// Perform the calculation
-	var result int64
+	var result float64
 	gradesList := req.Num1
 
 	for _, grade := range gradesList {
 		result += grade
 	}
 
-	result /= int64(len(gradesList))
+	result /= float64(len(gradesList))
 
 	return &calculator.CapCalculatorResp{
 		Message: result,

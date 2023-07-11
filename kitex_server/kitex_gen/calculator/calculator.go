@@ -515,7 +515,7 @@ func (p *CalculatorResp) Field1DeepEqual(src string) bool {
 }
 
 type CapCalculatorReq struct {
-	Num1 []int64 `thrift:"num1,1" frugal:"1,default,list<i64>" json:"num1"`
+	Num1 []float64 `thrift:"num1,1" frugal:"1,default,list<double>" json:"num1"`
 }
 
 func NewCapCalculatorReq() *CapCalculatorReq {
@@ -526,10 +526,10 @@ func (p *CapCalculatorReq) InitDefault() {
 	*p = CapCalculatorReq{}
 }
 
-func (p *CapCalculatorReq) GetNum1() (v []int64) {
+func (p *CapCalculatorReq) GetNum1() (v []float64) {
 	return p.Num1
 }
-func (p *CapCalculatorReq) SetNum1(val []int64) {
+func (p *CapCalculatorReq) SetNum1(val []float64) {
 	p.Num1 = val
 }
 
@@ -601,10 +601,10 @@ func (p *CapCalculatorReq) ReadField1(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	p.Num1 = make([]int64, 0, size)
+	p.Num1 = make([]float64, 0, size)
 	for i := 0; i < size; i++ {
-		var _elem int64
-		if v, err := iprot.ReadI64(); err != nil {
+		var _elem float64
+		if v, err := iprot.ReadDouble(); err != nil {
 			return err
 		} else {
 			_elem = v
@@ -651,11 +651,11 @@ func (p *CapCalculatorReq) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("num1", thrift.LIST, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteListBegin(thrift.I64, len(p.Num1)); err != nil {
+	if err := oprot.WriteListBegin(thrift.DOUBLE, len(p.Num1)); err != nil {
 		return err
 	}
 	for _, v := range p.Num1 {
-		if err := oprot.WriteI64(v); err != nil {
+		if err := oprot.WriteDouble(v); err != nil {
 			return err
 		}
 	}
@@ -691,7 +691,7 @@ func (p *CapCalculatorReq) DeepEqual(ano *CapCalculatorReq) bool {
 	return true
 }
 
-func (p *CapCalculatorReq) Field1DeepEqual(src []int64) bool {
+func (p *CapCalculatorReq) Field1DeepEqual(src []float64) bool {
 
 	if len(p.Num1) != len(src) {
 		return false
@@ -706,7 +706,7 @@ func (p *CapCalculatorReq) Field1DeepEqual(src []int64) bool {
 }
 
 type CapCalculatorResp struct {
-	Message int64 `thrift:"message,1" frugal:"1,default,i64" json:"message"`
+	Message float64 `thrift:"message,1" frugal:"1,default,double" json:"message"`
 }
 
 func NewCapCalculatorResp() *CapCalculatorResp {
@@ -717,10 +717,10 @@ func (p *CapCalculatorResp) InitDefault() {
 	*p = CapCalculatorResp{}
 }
 
-func (p *CapCalculatorResp) GetMessage() (v int64) {
+func (p *CapCalculatorResp) GetMessage() (v float64) {
 	return p.Message
 }
-func (p *CapCalculatorResp) SetMessage(val int64) {
+func (p *CapCalculatorResp) SetMessage(val float64) {
 	p.Message = val
 }
 
@@ -748,7 +748,7 @@ func (p *CapCalculatorResp) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.DOUBLE {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -788,7 +788,7 @@ ReadStructEndError:
 }
 
 func (p *CapCalculatorResp) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI64(); err != nil {
+	if v, err := iprot.ReadDouble(); err != nil {
 		return err
 	} else {
 		p.Message = v
@@ -826,10 +826,10 @@ WriteStructEndError:
 }
 
 func (p *CapCalculatorResp) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("message", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("message", thrift.DOUBLE, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Message); err != nil {
+	if err := oprot.WriteDouble(p.Message); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -861,7 +861,7 @@ func (p *CapCalculatorResp) DeepEqual(ano *CapCalculatorResp) bool {
 	return true
 }
 
-func (p *CapCalculatorResp) Field1DeepEqual(src int64) bool {
+func (p *CapCalculatorResp) Field1DeepEqual(src float64) bool {
 
 	if p.Message != src {
 		return false

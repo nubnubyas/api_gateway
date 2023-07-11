@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	database "github.com/cloudwego/api_gateway/kitex_server"
 	calculator "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/calculator"
@@ -20,26 +21,56 @@ type UniversityGradesImpl struct{}
 func (s *UniversityGradesImpl) GetGrades(ctx context.Context, req *grader.GetCapRequest) (resp *grader.GetCapResponse, err error) {
 	// TODO: Your code here...
 
-	cap := []int64{}
+	//cap := []int64{}
+	cap := []float64{}
 	id := int(req.StudentId)
 	// ie. gradesInString := "AAABA"
 	response, gradesInString, _ := database.GetGradesDB(id)
-	for _, grade := range gradesInString {
+	grades := strings.Split(gradesInString, ",")
+	for _, grade := range grades {
 		switch grade {
-		case 'A':
+		case "A+":
 			cap = append(cap, 5)
-		case 'B':
+		case "A":
+			cap = append(cap, 5)
+		case "A-":
+			cap = append(cap, 4.5)
+		case "B+":
 			cap = append(cap, 4)
-		case 'C':
+		case "B":
+			cap = append(cap, 3.5)
+		case "B-":
 			cap = append(cap, 3)
-		case 'D':
+		case "C+":
+			cap = append(cap, 2.5)
+		case "C":
 			cap = append(cap, 2)
-		case 'E':
+		case "D+":
+			cap = append(cap, 1.5)
+		case "D":
 			cap = append(cap, 1)
-		case 'F':
+		case "F":
 			cap = append(cap, 0)
 		}
 	}
+	/*
+		for _, grade := range gradesInString {
+			switch grade {
+			case 'A':
+				cap = append(cap, 5)
+			case 'B':
+				cap = append(cap, 4)
+			case 'C':
+				cap = append(cap, 3)
+			case 'D':
+				cap = append(cap, 2)
+			case 'E':
+				cap = append(cap, 1)
+			case 'F':
+				cap = append(cap, 0)
+			}
+		}
+	*/
 
 	// Perform the calculation
 	calReq := new(calculator.CapCalculatorReq)

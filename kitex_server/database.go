@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	// "strconv"
 
@@ -73,10 +74,14 @@ func InsertGradesDB(req *grader.InsertGradeRequest) error {
 	}
 	defer db.Close()
 
-	gradeString := ""
-	for _, grade := range req.Grades {
-		gradeString += grade
-	}
+	/*
+		gradeString := ""
+		for _, grade := range req.Grades {
+			gradeString += grade
+			gradeString += ","
+		}
+	*/
+	gradeString := strings.Join(req.Grades, ", ")
 	_, err = db.Exec("UPDATE students SET grades = ? WHERE num = ?", gradeString, fmt.Sprintf("%d", req.StudentId))
 	if err != nil {
 		fmt.Println("Error inserting table:", err)
