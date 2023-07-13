@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	// "fmt"
 
 	"encoding/json"
 	"net/http"
@@ -50,6 +51,7 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 	if err != nil {
 		c.JSON(http.StatusOK, "error here generic call")
 		panic(err)
+		// fmt.Println(err)
 	}
 
 	c.JSON(http.StatusOK, resp)

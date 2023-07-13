@@ -81,7 +81,7 @@ func InsertGradesDB(req *grader.InsertGradeRequest) error {
 			gradeString += ","
 		}
 	*/
-	gradeString := strings.Join(req.Grades, ", ")
+	gradeString := strings.Join(req.Grades, ",")
 	_, err = db.Exec("UPDATE students SET grades = ? WHERE num = ?", gradeString, fmt.Sprintf("%d", req.StudentId))
 	if err != nil {
 		fmt.Println("Error inserting table:", err)
