@@ -13,11 +13,12 @@ struct calculatorResp {
 
 struct capCalculatorReq {
     // change the name of the field to grades
-    1: list<i64> num1 (api.form="grades")
+    //1: list<i64> num1 (api.form="grades")
+    1: list<double> num1 (api.form="grades")
 }
 
 struct capCalculatorResp {
-    1: i64 message
+    1:double message
 }
 
 service calculatorService {
