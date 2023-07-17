@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/cloudwego/api_gateway/hertz_gateway/biz/handler"
@@ -32,7 +31,7 @@ func clientCreation(entryName string, idlPath string) error {
 
 	fileSyntax, err := parser.ParseFile(filePath, nil, false)
 	if err != nil {
-		hlog.Fatalf("parse file failed: %v", err)
+		hlog.Errorf("parse file failed: %v", err)
 		return err
 	}
 
@@ -61,13 +60,13 @@ func clientCreation(entryName string, idlPath string) error {
 
 	provider, err := generic.NewThriftFileProvider(entryName, idlPath)
 	if err != nil {
-		hlog.Fatalf("new thrift file provider failed: %v", err)
+		hlog.Errorf("new thrift file provider failed: %v", err)
 		return err
 	}
 
 	g, err := generic.JSONThriftGeneric(provider)
 	if err != nil {
-		hlog.Fatal(err)
+		hlog.Error(err)
 		return err
 	}
 
@@ -80,14 +79,11 @@ func clientCreation(entryName string, idlPath string) error {
 		loadbalanceropt,
 	)
 	if err != nil {
-		hlog.Fatal(err)
+		hlog.Error(err)
 		return err
 	}
 
 	handler.SvcMap[svcName] = cli
-	fmt.Println(svcName)
-	fmt.Println(handler.PathToMethod)
-	fmt.Println(handler.SvcMap)
 	return nil
 }
 
@@ -107,14 +103,14 @@ func watchIDLs(idlPath string) {
 	go func() {
 		watcher, err := fsnotify.NewWatcher()
 		if err != nil {
-			hlog.Fatal(err)
+			hlog.Error(err)
 		}
 		defer watcher.Close()
 
 		// Watch IDL path for changes
 		err = watcher.Add(idlPath)
 		if err != nil {
-			hlog.Fatal(err)
+			hlog.Error(err)
 		}
 
 		for {
@@ -127,7 +123,6 @@ func watchIDLs(idlPath string) {
 				if event.Op&fsnotify.Create == fsnotify.Create && event.Op&fsnotify.Rename != fsnotify.Rename {
 					// IDL file has been modified, signal change
 					name := strings.Split(event.Name, "\\")
-					fmt.Println("reached here, create")
 					select {
 					case changeChan <- []string{name[2], "add"}:
 					default:
@@ -136,7 +131,6 @@ func watchIDLs(idlPath string) {
 
 				if event.Op&fsnotify.Remove == fsnotify.Remove {
 					name := strings.Split(event.Name, "\\")
-					fmt.Println("reached here, delete")
 					select {
 					case changeChan <- []string{name[2], "remove"}:
 					default:
@@ -147,8 +141,6 @@ func watchIDLs(idlPath string) {
 			}
 		}
 	}()
-
-	fmt.Println("watchidl")
 
 	for entry := range changeChan {
 		switch entry[1] {

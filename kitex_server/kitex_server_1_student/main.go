@@ -31,6 +31,7 @@ func main() {
 	err := svr.Run()
 
 	if err != nil {
+		klog.Fatal(err)
 		log.Println(err.Error())
 	}
 

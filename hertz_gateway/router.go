@@ -39,12 +39,12 @@ func registerIDLs(r *server.Hertz) {
 	idlPath := "../idl/"
 	c, err := os.ReadDir(idlPath)
 	if err != nil {
-		hlog.Fatalf("new thrift file provider failed: %v", err)
+		hlog.Errorf("new thrift file provider failed: %v", err)
 	}
 
 	// same resolver for all generic clients
 	if registerCenter.ErrResolver != nil {
-		hlog.Fatalf("err:%v", err)
+		hlog.Errorf("err: %v", err)
 	}
 
 	// generic clients creation
@@ -52,7 +52,7 @@ func registerIDLs(r *server.Hertz) {
 
 		err := clientCreation(entry.Name(), idlPath)
 		if err != nil {
-			hlog.Fatal(err)
+			hlog.Error(err)
 			break
 		}
 	}
