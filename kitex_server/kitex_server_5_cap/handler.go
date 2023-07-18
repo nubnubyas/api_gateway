@@ -64,7 +64,7 @@ func (s *UniversityGradesImpl) GetGrades(ctx context.Context, req *grader.GetCap
 		calReq.Num1 = cap
 
 		// make request to another RPC server with Calculator service
-		loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
+		loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRandomBalancer())
 		calcCli, err := calculatorservice.NewClient("calculator",
 			client.WithResolver(registerCenter.NacosResolver),
 			loadbalanceropt)
