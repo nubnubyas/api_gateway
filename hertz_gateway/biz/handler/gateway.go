@@ -27,10 +27,16 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 
 	reqBody := string(c.Request.Body())
 
+	// // Get the HTTP request path (works)
+	// pathtest := c.Request.URI().RequestURI()
+	// fmt.Println(string(pathtest))
+	// // Get the HTTP request method (works)
+	// methodtest := c.Request.Method
+	// fmt.Println(string(methodtest()))
+
 	// verify the if request body is encoded in JSON (only if it is non-GET requests)
 	// GET requests do not have request body (uses query string instead)
 	if !checkJSON(reqBody) {
-		// c.JSON(http.StatusOK, "request body is not in JSON format")
 		hlog.Error("JsonNotFound err")
 		c.JSON(http.StatusOK, errors.New(common.Err_JsonNotFound))
 		return
@@ -46,7 +52,6 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 	// get generic client through service name
 	cli, ok := SvcMap[svcName]
 	if !ok {
-		// c.JSON(http.StatusOK, "cannot get generic client")
 		hlog.Errorf("Generic Client Not Found err")
 		c.JSON(http.StatusOK, errors.New(common.Err_GenericClientNotFound))
 		return
@@ -55,11 +60,9 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 	// make generic call to the service with the method name
 	resp, err := cli.GenericCall(ctx, methodName, reqBody)
 	if err != nil {
-		// c.JSON(http.StatusOK, "error here generic call")
 		hlog.Errorf("Generic Call err:%v", err)
 		c.JSON(http.StatusOK, errors.New(common.Err_GenericCallFailed))
 		panic(err)
-		// fmt.Println(err)
 	}
 
 	c.JSON(http.StatusOK, resp)

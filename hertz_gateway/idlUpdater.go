@@ -55,50 +55,6 @@ func clientCreation(entryName string, idlPath string) error {
 		}
 	}
 
-	/*
-		// get the method name from the annotation, fill up pathToMethod map
-		fileSyntax.ForEachService(func(v *parser.Service) bool {
-			v.ForEachFunction(func(v *parser.Function) bool {
-				functionName := v.Name
-				if handler.PathToMethod[svcName] == nil {
-					handler.PathToMethod[svcName] = make(map[string]string)
-				}
-
-				var subpath string
-				httpMethods := []string{"api.get", "api.post", "api.put", "api.delete", "api.patch", "api.head", "api.options"}
-
-				for _, method := range httpMethods {
-					if len(v.Annotations.Get(method)) > 0 {
-						subpath = methodSplit(v.Annotations.Get(method))
-						handler.PathToMethod[svcName][subpath] = functionName
-						break
-					}
-				}
-
-					switch {
-					case len(v.Annotations.Get("api.get")) > 0:
-						subpath = methodSplit(v.Annotations.Get("api.get"))
-					case len(v.Annotations.Get("api.post")) > 0:
-						subpath = methodSplit(v.Annotations.Get("api.post"))
-					case len(v.Annotations.Get("api.put")) > 0:
-						subpath = methodSplit(v.Annotations.Get("api.put"))
-					case len(v.Annotations.Get("api.delete")) > 0:
-						subpath = methodSplit(v.Annotations.Get("api.delete"))
-					case len(v.Annotations.Get("api.patch")) > 0:
-						subpath = methodSplit(v.Annotations.Get("api.patch"))
-					case len(v.Annotations.Get("api.head")) > 0:
-						subpath = methodSplit(v.Annotations.Get("api.head"))
-					case len(v.Annotations.Get("api.options")) > 0:
-						subpath = methodSplit(v.Annotations.Get("api.options"))
-					}
-
-					handler.PathToMethod[svcName][subpath] = functionName
-				return true
-			})
-			return true
-		})
-	*/
-
 	provider, err := generic.NewThriftFileProvider(entryName, idlPath)
 	if err != nil {
 		hlog.Errorf("new thrift file provider failed: %v", err)
@@ -111,7 +67,7 @@ func clientCreation(entryName string, idlPath string) error {
 		return err
 	}
 
-	loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
+	loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRandomBalancer())
 	// creates new generic client for each IDL
 	cli, err := genericclient.NewClient(
 		svcName,

@@ -50,6 +50,10 @@ func registerIDLs(r *server.Hertz) {
 	// generic clients creation
 	for _, entry := range c {
 
+		if entry.IsDir() || entry.Name() == "common.thrift" {
+			continue
+		}
+
 		err := clientCreation(entry.Name(), idlPath)
 		if err != nil {
 			hlog.Error(err)
