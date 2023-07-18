@@ -21,90 +21,68 @@ type UniversityGradesImpl struct{}
 func (s *UniversityGradesImpl) GetGrades(ctx context.Context, req *grader.GetCapRequest) (resp *grader.GetCapResponse, err error) {
 	// TODO: Your code here...
 
-	//cap := []int64{}
-	cap := []float64{}
-	id := int(req.StudentId)
-	// ie. gradesInString := "AAABA"
-	response, gradesInString, _ := database.GetGradesDB(id)
-	grades := strings.Split(gradesInString, ",")
-	for _, grade := range grades {
-		switch grade {
-		case "A+":
-			cap = append(cap, 5)
-		case "A":
-			cap = append(cap, 5)
-		case "A-":
-			cap = append(cap, 4.5)
-		case "B+":
-			cap = append(cap, 4)
-		case "B":
-			cap = append(cap, 3.5)
-		case "B-":
-			cap = append(cap, 3)
-		case "C+":
-			cap = append(cap, 2.5)
-		case "C":
-			cap = append(cap, 2)
-		case "D+":
-			cap = append(cap, 1.5)
-		case "D":
-			cap = append(cap, 1)
-		case "F":
-			cap = append(cap, 0)
-		}
-	}
-	/*
-		for _, grade := range gradesInString {
+	num := fmt.Sprintf("%d", req.StudentId)
+	exist, _ := database.NumExists(num)
+	if !exist {
+		return &grader.GetCapResponse{}, nil
+	} else {
+		cap := []float64{}
+		id := int(req.StudentId)
+		// ie. gradesInString := "A,A,A-,B,A+"
+		response, gradesInString, _ := database.GetGradesDB(id)
+		grades := strings.Split(gradesInString, ",")
+		// CAP, aka NUS GPA equivalent. ie. A+ = 5.0, A = 5.0, A- = 4.5, B+ = 4.0,
+		// B = 3.5, B- = 3.0, C+ = 2.5, C = 2.0, D+ = 1.5, D = 1.0, F = 0
+		for _, grade := range grades {
 			switch grade {
-			case 'A':
+			case "A+":
 				cap = append(cap, 5)
-			case 'B':
+			case "A":
+				cap = append(cap, 5)
+			case "A-":
+				cap = append(cap, 4.5)
+			case "B+":
 				cap = append(cap, 4)
-			case 'C':
+			case "B":
+				cap = append(cap, 3.5)
+			case "B-":
 				cap = append(cap, 3)
-			case 'D':
+			case "C+":
+				cap = append(cap, 2.5)
+			case "C":
 				cap = append(cap, 2)
-			case 'E':
+			case "D+":
+				cap = append(cap, 1.5)
+			case "D":
 				cap = append(cap, 1)
-			case 'F':
+			case "F":
 				cap = append(cap, 0)
 			}
 		}
-	*/
 
-	// Perform the calculation
-	calReq := new(calculator.CapCalculatorReq)
-	calReq.Num1 = cap
+		calReq := new(calculator.CapCalculatorReq)
+		calReq.Num1 = cap
 
-	// make request to another RPC server with Calculator service
-	loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
-	calcCli, err := calculatorservice.NewClient("calculator",
-		client.WithResolver(registerCenter.NacosResolver),
-		loadbalanceropt)
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
+		// make request to another RPC server with Calculator service
+		loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRoundRobinBalancer())
+		calcCli, err := calculatorservice.NewClient("calculator",
+			client.WithResolver(registerCenter.NacosResolver),
+			loadbalanceropt)
+		if err != nil {
+			fmt.Println(err)
+			panic(err)
+		}
+
+		// Perform the calculation
+		calResp, err1 := calcCli.CapCalculate(ctx, calReq)
+		if err1 != nil {
+			fmt.Println(err1)
+			panic(err1)
+		}
+
+		response.Cap = calResp.Message
+		return response, nil
 	}
-
-	calResp, err1 := calcCli.CapCalculate(ctx, calReq)
-	if err1 != nil {
-		fmt.Println(err1)
-		panic(err1)
-	}
-
-	// final is an int 64
-	final := calResp.Message
-	response.Cap = float64(final)
-
-	return response, nil
-
-	// resp : &grader.GetCapResponse{
-	// 	Id:     3,
-	// 	Name:   "Testname",
-	// 	Major:  "Business",
-	// 	Gender: "Male",
-	// 	Cap:    final,
-	// }, nil
 }
 
 // InsertGrades implements the UniversityGradesImpl interface.

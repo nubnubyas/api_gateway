@@ -5,22 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	// "strconv"
-
 	api "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/api"
 	grader "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/grader"
+	"github.com/cloudwego/kitex/pkg/klog"
 	_ "github.com/go-sql-driver/mysql"
 )
-
-// to do : for student_api (add grades into table) and grader_api (get grades from table)
-
-// type Student struct {
-// 	Id     string
-// 	Name   string
-// 	Major  string
-// 	Gender string
-// 	Grades string
-// }
 
 // opens the database and creates the table if it does not exist
 func OpenDatabase() (*sql.DB, error) {
@@ -42,7 +31,8 @@ func OpenDatabase() (*sql.DB, error) {
 		);
 	`)
 	if err != nil {
-		fmt.Println("Error creating table:", err)
+		klog.Errorf("Error creating table: %v", err)
+		// fmt.Println("Error creating table:", err)
 		return nil, err
 	}
 
@@ -59,7 +49,8 @@ func InsertStudentDB(student *api.InsertStudentRequest) error {
 
 	_, err = db.Exec("INSERT INTO students (num, name, major, gender) VALUES (?, ?, ?, ?)", student.Id, student.Name, student.Major, student.Gender)
 	if err != nil {
-		fmt.Println("Error inserting table:", err)
+		klog.Errorf("Error inserting table: %v", err)
+		// fmt.Println("Error inserting table:", err)
 		return err
 	}
 
@@ -74,17 +65,11 @@ func InsertGradesDB(req *grader.InsertGradeRequest) error {
 	}
 	defer db.Close()
 
-	/*
-		gradeString := ""
-		for _, grade := range req.Grades {
-			gradeString += grade
-			gradeString += ","
-		}
-	*/
-	gradeString := strings.Join(req.Grades, ", ")
+	gradeString := strings.Join(req.Grades, ",")
 	_, err = db.Exec("UPDATE students SET grades = ? WHERE num = ?", gradeString, fmt.Sprintf("%d", req.StudentId))
 	if err != nil {
-		fmt.Println("Error inserting table:", err)
+		klog.Errorf("Error inserting table: %v", err)
+		// fmt.Println("Error inserting table:", err)
 		return err
 	}
 
@@ -102,7 +87,8 @@ func NumExists(num string) (bool, error) {
 	var exists bool
 	err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM students WHERE num = ?)", num).Scan(&exists)
 	if err != nil {
-		fmt.Println("Error to check exist:", err)
+		klog.Errorf("Error to check if num exist: %v", err)
+		// fmt.Println("Error to check exist:", err)
 		return false, err
 	}
 
@@ -120,7 +106,8 @@ func QueryStudentDB(num string) (*api.QueryStudentResponse, error) {
 	var resp api.QueryStudentResponse
 	err = db.QueryRow("SELECT num, name, major, gender FROM students WHERE num = ?", num).Scan(&resp.Id, &resp.Name, &resp.Major, &resp.Gender)
 	if err != nil {
-		fmt.Println("Error Query table:", err)
+		klog.Errorf("Error Query Table: %v", err)
+		// fmt.Println("Error Query table:", err)
 		return nil, err
 	}
 
@@ -138,7 +125,8 @@ func GetGradesDB(id int) (*grader.GetCapResponse, string, error) {
 	var grades string
 	err = db.QueryRow("SELECT num, name, major, gender, grades FROM students WHERE num = ?", fmt.Sprintf("%d", id)).Scan(&resp.Id, &resp.Name, &resp.Major, &resp.Gender, &grades)
 	if err != nil {
-		fmt.Println("Error getting Student:", err)
+		klog.Errorf("Error getting student: %v", err)
+		// fmt.Println("Error getting Student:", err)
 		return nil, "", err
 	}
 
