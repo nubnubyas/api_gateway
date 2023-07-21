@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	// "fmt"
 
 	"encoding/json"
 	"net/http"
@@ -20,19 +19,31 @@ var SvcMap = make(map[string]genericclient.Client)
 
 // input the service name and method name into nested map,
 // gets the method name in the generic client
-var PathToMethod = make(map[string]map[string]string)
+// var PathToMethod = make(map[string]map[string]string)
+var PathToMethod = make(map[string]map[MethodPath]string)
+
+var FileToSvc = make(map[string][]string)
+
+type MethodPath struct {
+	Path   string
+	Method string
+}
 
 // Gateway handle the request with the query path of prefix `/gateway`.
 func Gateway(ctx context.Context, c *app.RequestContext) {
 
 	reqBody := string(c.Request.Body())
 
-	// // Get the HTTP request path (works)
-	// pathtest := c.Request.URI().RequestURI()
-	// fmt.Println(string(pathtest))
-	// // Get the HTTP request method (works)
-	// methodtest := c.Request.Method
-	// fmt.Println(string(methodtest()))
+	var methodParam MethodPath
+
+	// Get the HTTP request path (works)
+	httpPath := string(c.Request.URI().RequestURI())
+	//fmt.Println(string(pathtest))
+	// Get the HTTP request method (works)
+	httpMethod := string(c.Request.Method())
+	//fmt.Println(string(methodtest()))
+	methodParam.Method = httpMethod
+	methodParam.Path = httpPath
 
 	// verify the if request body is encoded in JSON (only if it is non-GET requests)
 	// GET requests do not have request body (uses query string instead)
@@ -42,12 +53,12 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// ie student_api, calculator
+	// ie student_api, calculators
 	svcName := c.Param("svc")
 	// ie queryStudent, insertStudent, get
-	method := c.Param("method")
-	path := svcName + "/" + method
-	methodName := PathToMethod[svcName][path]
+	// method := c.Param("method")
+	// path := svcName + "/" + method
+	methodName := PathToMethod[svcName][methodParam]
 
 	// get generic client through service name
 	cli, ok := SvcMap[svcName]

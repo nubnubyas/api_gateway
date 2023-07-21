@@ -18,11 +18,10 @@ struct capCalculatorReq {
 }
 
 struct capCalculatorResp {
-    1:double message
+    1: double message
 }
 
 service calculatorService {
-    calculatorResp calculate(1: calculatorReq request) (api.post="/calculator/get") 
-    capCalculatorResp capCalculate(1: capCalculatorReq request) (api.post="/calculator/cap") 
-
+    calculatorResp calculate(1: calculatorReq request)  (api.get="/calculatorService/get")
+    capCalculatorResp capCalculate(1: capCalculatorReq request) (api.post="/calculatorService/cap") 
 }

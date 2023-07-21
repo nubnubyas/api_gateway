@@ -30,11 +30,13 @@ func customizedRegister(r *server.Hertz) {
 func registerIDLs(r *server.Hertz) {
 	group := r.Group("/")
 	{
-		group.Any("/:svc/:method", handler.Gateway)
+		//group.Any("/:svc/:method", handler.Gateway)
+		group.Any("/:svc/*path", handler.Gateway)
 	}
 
 	handler.SvcMap = make(map[string]genericclient.Client)
-	handler.PathToMethod = make(map[string]map[string]string)
+	//handler.PathToMethod = make(map[string]map[string]string)
+	handler.PathToMethod = make(map[string]map[handler.MethodPath]string)
 
 	idlPath := "../idl/"
 	c, err := os.ReadDir(idlPath)
@@ -54,7 +56,7 @@ func registerIDLs(r *server.Hertz) {
 			continue
 		}
 
-		err := clientCreation(entry.Name(), idlPath)
+		err := createGenericClient(entry.Name(), idlPath)
 		if err != nil {
 			hlog.Error(err)
 			break

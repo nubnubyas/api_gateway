@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/cloudwego/api_gateway/hertz_gateway/biz/handler"
@@ -15,80 +16,111 @@ import (
 	"github.com/cloudwego/kitex/pkg/loadbalance"
 )
 
-// to split the path name
-func methodSplit(pathName []string) string {
-	path := pathName[0]
-	parts := strings.Split(path, "/")
-	subpath := strings.Join(parts[1:], "/")
-	return subpath
-}
+// createGenericClient creates a generic client for newly added IDL files
+func createGenericClient(entryName string, idlPath string) error {
+	// Remove .thrift extension from entry name
+	thriftName := strings.ReplaceAll(entryName, ".thrift", "")
 
-// create generic client for newly added IDL files
-func clientCreation(entryName string, idlPath string) error {
-	svcName := strings.ReplaceAll(entryName, ".thrift", "")
-
+	// Construct file path
 	filePath := idlPath + entryName
 
+	// Parse the thrift file
 	fileSyntax, err := parser.ParseFile(filePath, nil, false)
 	if err != nil {
 		hlog.Errorf("parse file failed: %v", err)
 		return err
 	}
 
-	for _, svc := range fileSyntax.Services {
-		for _, function := range svc.Functions {
-			functionName := function.Name
-			if handler.PathToMethod[svcName] == nil {
-				handler.PathToMethod[svcName] = make(map[string]string)
-			}
-
-			var subpath string
-			httpMethods := []string{"api.get", "api.post", "api.put", "api.delete", "api.patch", "api.head", "api.options"}
-
-			for _, method := range httpMethods {
-				if len(function.Annotations.Get(method)) > 0 {
-					subpath = methodSplit(function.Annotations.Get(method))
-					handler.PathToMethod[svcName][subpath] = functionName
-					break
-				}
-			}
-		}
-	}
-
+	// Create a new thrift file provider
 	provider, err := generic.NewThriftFileProvider(entryName, idlPath)
 	if err != nil {
 		hlog.Errorf("new thrift file provider failed: %v", err)
 		return err
 	}
 
+	// Create a JSON thrift generic provider
 	g, err := generic.JSONThriftGeneric(provider)
 	if err != nil {
 		hlog.Error(err)
 		return err
 	}
 
-	loadbalanceropt := client.WithLoadBalancer(loadbalance.NewWeightedRandomBalancer())
-	// creates new generic client for each IDL
+	// Create a generic client with a new weighted random balancer
+	loadBalancerOpt := client.WithLoadBalancer(loadbalance.NewWeightedRandomBalancer())
 	cli, err := genericclient.NewClient(
-		svcName,
+		thriftName,
 		g,
 		client.WithResolver(registerCenter.NacosResolver),
-		loadbalanceropt,
+		loadBalancerOpt,
 	)
 	if err != nil {
 		hlog.Error(err)
 		return err
 	}
 
-	handler.SvcMap[svcName] = cli
+	if handler.FileToSvc[thriftName] == nil {
+		handler.FileToSvc[thriftName] = make([]string, 3)
+	}
+
+	httpMethodsInCaps := []string{"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"}
+	httpMethods := []string{"api.get", "api.post", "api.put", "api.delete", "api.patch", "api.head", "api.options"}
+
+	fmt.Println(thriftName)
+	for _, svc := range fileSyntax.Services {
+		handler.FileToSvc[thriftName] = append(handler.FileToSvc[thriftName], svc.Name)
+		handler.SvcMap[svc.Name] = cli
+
+		for _, function := range svc.Functions {
+			var subpath string
+			functionName := function.Name
+
+			// Initialize PathToMethod map if it's nil
+			if handler.PathToMethod[svc.Name] == nil {
+				handler.PathToMethod[svc.Name] = make(map[handler.MethodPath]string)
+			}
+
+			// Check if function has any HTTP method annotation
+			for index, method := range httpMethods {
+				if len(function.Annotations.Get(method)) > 0 {
+					subpath = function.Annotations.Get(method)[0]
+					methodParam := handler.MethodPath{
+						Path:   subpath,
+						Method: httpMethodsInCaps[index],
+					}
+
+					handler.PathToMethod[svc.Name][methodParam] = functionName
+					//handler.PathToMethod[svcName][subpath] = functionName
+					break
+				}
+			}
+
+			// If function has no HTTP method annotation, default to POST
+			if subpath == "" {
+				methodParam := handler.MethodPath{
+					Path:   "/" + svc.Name + "/" + functionName,
+					Method: "POST",
+				}
+				handler.PathToMethod[svc.Name][methodParam] = functionName
+			}
+		}
+	}
+	fmt.Println(handler.PathToMethod)
 	return nil
 }
 
-// remove generic client for deleted IDL files
-func clientRemoval(entryName string, idlPath string) {
-	svcName := strings.ReplaceAll(entryName, ".thrift", "")
-	delete(handler.SvcMap, svcName)
-	delete(handler.PathToMethod, svcName)
+// removeGenericClient removes a generic client for deleted IDL files
+func removeGenericClient(entryName string, idlPath string) {
+	// Remove .thrift extension from entry name
+	thriftName := strings.ReplaceAll(entryName, ".thrift", "")
+
+	// Get services associated with the thrift file
+	services := handler.FileToSvc[thriftName]
+
+	// Remove services from SvcMap and PathToMethod
+	for _, svc := range services {
+		delete(handler.SvcMap, svc)
+		delete(handler.PathToMethod, svc)
+	}
 }
 
 // watchIDLs watches the IDL directory for changes
@@ -113,12 +145,8 @@ func watchIDLs(idlPath string) {
 		for {
 			select {
 			case event := <-watcher.Events:
-				/*
-					if event.Op&fsnotify.Write == fsnotify.Write {}
-					if event.Op&fsnotify.Rename == fsnotify.Rename {}
-				*/
-				if event.Op&fsnotify.Create == fsnotify.Create && event.Op&fsnotify.Rename != fsnotify.Rename {
-					// IDL file has been modified, signal change
+				// Handle different types of file changes
+				if event.Op&fsnotify.Create == fsnotify.Create {
 					name := strings.Split(event.Name, "\\")
 					select {
 					case changeChan <- []string{name[2], "add"}:
@@ -133,18 +161,30 @@ func watchIDLs(idlPath string) {
 					default:
 					}
 				}
+
+				// Versions to be used must exist in the idl folder
+				if event.Op&fsnotify.Rename == fsnotify.Rename || event.Op&fsnotify.Write == fsnotify.Write {
+					name := strings.Split(event.Name, "\\")
+					select {
+					case changeChan <- []string{name[2], "rename"}:
+					default:
+					}
+				}
 			case err := <-watcher.Errors:
 				hlog.Error(err)
 			}
 		}
 	}()
 
+	// Handle file changes
 	for entry := range changeChan {
 		switch entry[1] {
 		case "add":
-			clientCreation(entry[0], idlPath)
+			createGenericClient(entry[0], idlPath)
 		case "remove":
-			clientRemoval(entry[0], idlPath)
+			removeGenericClient(entry[0], idlPath)
+		case "rename":
+			removeGenericClient(entry[0], idlPath)
 		}
 	}
 }
