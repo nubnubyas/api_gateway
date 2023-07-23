@@ -18,12 +18,12 @@ func main() {
 		klog.Fatal(registerCenter.ErrRegistry)
 	}
 
-	// host := "8085"
+	// host := "8087"
 	svr := grader.NewServer(
 		new(UniversityGradesImpl),
 		server.WithRegistry(registerCenter.NacosRegistry),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "grader"}),
-		server.WithServiceAddr(&net.TCPAddr{IP: net.IPv4(127, 0, 0, 1), Port: 8085}),
+		server.WithServiceAddr(&net.TCPAddr{IP: net.IPv4(127, 0, 0, 1), Port: 8087}),
 		server.WithReadWriteTimeout(600*time.Second),
 	)
 

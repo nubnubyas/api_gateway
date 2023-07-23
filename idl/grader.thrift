@@ -39,8 +39,8 @@ struct GetCapResponse {
 service UniversityGrades {
 //   void addStudent(1: Student student),
 // post req to get input all the grades for a student 
-  GetCapResponse getGrades(1: GetCapRequest req) (api.get="/grader/query");
-  InsertGradeResponse insertGrades(1: InsertGradeRequest req) (api.post="/grader/insert");
+  GetCapResponse getGrades(1: GetCapRequest req) (api.get="/UniversityGrades/query");
+  InsertGradeResponse insertGrades(1: InsertGradeRequest req) (api.post="/UniversityGrades/insert");
   // void addExam(1: Exam exam),
   // void addGrade(1: Grade grade),
   // list<Grade> getGradesForStudent(1: i32 student_id),
