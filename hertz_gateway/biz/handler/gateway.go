@@ -49,7 +49,7 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 	// GET requests do not have request body (uses query string instead)
 	if !checkJSON(reqBody) {
 		hlog.Error("JsonNotFound err")
-		c.JSON(http.StatusOK, errors.New(common.Err_JsonNotFound))
+		c.JSON(http.StatusNoContent, errors.New(common.Err_JsonNotFound))
 		return
 	}
 
@@ -64,7 +64,7 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 	cli, ok := SvcMap[svcName]
 	if !ok {
 		hlog.Errorf("Generic Client Not Found err")
-		c.JSON(http.StatusOK, errors.New(common.Err_GenericClientNotFound))
+		c.JSON(http.StatusNotFound, errors.New(common.Err_GenericClientNotFound))
 		return
 	}
 
@@ -72,7 +72,7 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 	resp, err := cli.GenericCall(ctx, methodName, reqBody)
 	if err != nil {
 		hlog.Errorf("Generic Call err:%v", err)
-		c.JSON(http.StatusOK, errors.New(common.Err_GenericCallFailed))
+		c.JSON(http.StatusBadRequest, errors.New(common.Err_GenericCallFailed))
 		panic(err)
 	}
 

@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/cloudwego/hertz/pkg/app/middlewares/server/basic_auth"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
@@ -10,6 +11,14 @@ func main() {
 	h := server.Default(
 		server.WithHostPorts("127.0.0.1:8080"),
 	)
+
+	h.Use(basic_auth.BasicAuth(map[string]string{
+		"monday":     "mahjong",
+		"bytedance":  "internship",
+		"china":      "number1",
+		"instagram?": "weibo!",
+		"whatsapp?":  "wechat!",
+	}))
 
 	register(h)
 	h.Spin()
