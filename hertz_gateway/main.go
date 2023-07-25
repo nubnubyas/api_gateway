@@ -3,8 +3,13 @@
 package main
 
 import (
+	"time"
+
 	"github.com/cloudwego/hertz/pkg/app/middlewares/server/basic_auth"
 	"github.com/cloudwego/hertz/pkg/app/server"
+
+	"github.com/hertz-contrib/cache"
+	"github.com/hertz-contrib/cache/persist"
 )
 
 func main() {
@@ -12,6 +17,7 @@ func main() {
 		server.WithHostPorts("127.0.0.1:8080"),
 	)
 
+	// BasicAuth middleware
 	h.Use(basic_auth.BasicAuth(map[string]string{
 		"monday":     "mahjong",
 		"bytedance":  "internship",
@@ -19,6 +25,11 @@ func main() {
 		"instagram?": "weibo!",
 		"whatsapp?":  "wechat!",
 	}))
+
+	// Cache middleware
+	memoryStore := persist.NewMemoryStore(1 * time.Minute)
+	// sets the TTL value for URI-based items in the cache
+	h.Use(cache.NewCacheByRequestURI(memoryStore, 2*time.Second))
 
 	register(h)
 	h.Spin()
