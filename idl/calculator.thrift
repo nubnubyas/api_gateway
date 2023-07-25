@@ -12,8 +12,6 @@ struct calculatorResp {
 }
 
 struct capCalculatorReq {
-    // change the name of the field to grades
-    //1: list<i64> num1 (api.form="grades")
     1: list<double> num1 (api.form="grades")
 }
 

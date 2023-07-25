@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net"
 	"time"
 
@@ -13,12 +12,10 @@ import (
 )
 
 func main() {
-
 	if registerCenter.ErrRegistry != nil {
 		klog.Fatal(registerCenter.ErrRegistry)
 	}
 
-	// host := "8089"
 	svr := grader.NewServer(
 		new(UniversityGradesImpl),
 		server.WithRegistry(registerCenter.NacosRegistry),
@@ -28,9 +25,7 @@ func main() {
 	)
 
 	err := svr.Run()
-
 	if err != nil {
 		klog.Fatal(err)
-		log.Println(err.Error())
 	}
 }

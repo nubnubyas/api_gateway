@@ -32,7 +32,6 @@ func OpenDatabase() (*sql.DB, error) {
 	`)
 	if err != nil {
 		klog.Errorf("Error creating table: %v", err)
-		// fmt.Println("Error creating table:", err)
 		return nil, err
 	}
 
@@ -50,7 +49,6 @@ func InsertStudentDB(student *api.InsertStudentRequest) error {
 	_, err = db.Exec("INSERT INTO students (num, name, major, gender) VALUES (?, ?, ?, ?)", student.Id, student.Name, student.Major, student.Gender)
 	if err != nil {
 		klog.Errorf("Error inserting table: %v", err)
-		// fmt.Println("Error inserting table:", err)
 		return err
 	}
 
@@ -69,7 +67,6 @@ func InsertGradesDB(req *grader.InsertGradeRequest) error {
 	_, err = db.Exec("UPDATE students SET grades = ? WHERE num = ?", gradeString, fmt.Sprintf("%d", req.StudentId))
 	if err != nil {
 		klog.Errorf("Error inserting table: %v", err)
-		// fmt.Println("Error inserting table:", err)
 		return err
 	}
 
@@ -88,7 +85,6 @@ func NumExists(num string) (bool, error) {
 	err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM students WHERE num = ?)", num).Scan(&exists)
 	if err != nil {
 		klog.Errorf("Error to check if num exist: %v", err)
-		// fmt.Println("Error to check exist:", err)
 		return false, err
 	}
 
@@ -107,7 +103,6 @@ func QueryStudentDB(num string) (*api.QueryStudentResponse, error) {
 	err = db.QueryRow("SELECT num, name, major, gender FROM students WHERE num = ?", num).Scan(&resp.Id, &resp.Name, &resp.Major, &resp.Gender)
 	if err != nil {
 		klog.Errorf("Error Query Table: %v", err)
-		// fmt.Println("Error Query table:", err)
 		return nil, err
 	}
 
@@ -126,7 +121,6 @@ func GetGradesDB(id int) (*grader.GetCapResponse, string, error) {
 	err = db.QueryRow("SELECT num, name, major, gender, grades FROM students WHERE num = ?", fmt.Sprintf("%d", id)).Scan(&resp.Id, &resp.Name, &resp.Major, &resp.Gender, &grades)
 	if err != nil {
 		klog.Errorf("Error getting student: %v", err)
-		// fmt.Println("Error getting Student:", err)
 		return nil, "", err
 	}
 

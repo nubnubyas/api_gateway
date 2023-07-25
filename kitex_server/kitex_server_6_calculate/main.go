@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net"
 	"time"
 
@@ -13,9 +12,7 @@ import (
 	"github.com/cloudwego/kitex/server"
 )
 
-// rpc server 6 port:8086
 func main() {
-
 	if registerCenter.ErrRegistry != nil {
 		klog.Fatal(registerCenter.ErrRegistry)
 	}
@@ -29,10 +26,7 @@ func main() {
 	)
 
 	err := svr.Run()
-
 	if err != nil {
 		klog.Fatal(err)
-		log.Println(err.Error())
 	}
-
 }

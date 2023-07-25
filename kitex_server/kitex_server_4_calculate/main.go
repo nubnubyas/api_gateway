@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net"
 	"time"
 
@@ -13,9 +12,7 @@ import (
 	"github.com/cloudwego/kitex/server"
 )
 
-// rpc server 4 port:8084
 func main() {
-
 	if registerCenter.ErrRegistry != nil {
 		klog.Fatal(registerCenter.ErrRegistry)
 	}
@@ -28,13 +25,8 @@ func main() {
 		server.WithReadWriteTimeout(600*time.Second),
 	)
 
-	// svr.SetReadTimeout(30 * time.Second)
-
 	err := svr.Run()
-
 	if err != nil {
 		klog.Fatal(err)
-		log.Println(err.Error())
 	}
-
 }

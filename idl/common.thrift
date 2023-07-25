@@ -14,6 +14,5 @@ enum Err
     GenericClientNotFound = 10009,
     GenericCallFailed     = 10010,
     GenericCallTimeout    = 10011,
-
 }
 

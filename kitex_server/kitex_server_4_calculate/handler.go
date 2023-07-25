@@ -14,8 +14,6 @@ type CalculatorResp struct {
 }
 
 func (s *CalculatorApiImpl) CapCalculate(ctx context.Context, req *calculator.CapCalculatorReq) (resp *calculator.CapCalculatorResp, err error) {
-
-	// Perform the calculation
 	var result float64
 	gradesList := req.Num1
 
@@ -32,10 +30,8 @@ func (s *CalculatorApiImpl) CapCalculate(ctx context.Context, req *calculator.Ca
 }
 
 func (s *CalculatorApiImpl) Calculate(ctx context.Context, req *calculator.CalculatorReq) (resp *calculator.CalculatorResp, err error) {
-	// Parse the request into a CalculatorReq struct
-
-	// Perform the calculation
 	var result int64
+
 	switch req.Operation {
 	case "add":
 		result = req.Num1 + req.Num2
@@ -56,7 +52,6 @@ func (s *CalculatorApiImpl) Calculate(ctx context.Context, req *calculator.Calcu
 		}, nil
 	}
 
-	// Create the response
 	calculatorResp := fmt.Sprintf("%s %d and %d is %d", req.Operation, req.Num1, req.Num2, result)
 	return &calculator.CalculatorResp{
 		Message: calculatorResp,

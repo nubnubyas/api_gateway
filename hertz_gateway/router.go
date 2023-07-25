@@ -16,26 +16,23 @@ import (
 	"github.com/cloudwego/kitex/client/genericclient"
 )
 
-// customizeRegister registers customize routers.
+// customizedRegister registers customize routers.
 func customizedRegister(r *server.Hertz) {
 	r.GET("/", func(ctx context.Context, c *app.RequestContext) {
 		c.JSON(http.StatusOK, "api-gateway is updated and running ... ")
 	})
 
-	print("customizedRegister\n")
 	registerIDLs(r)
 }
 
-// to update the IDL mapping
+// registerIDLs registers IDL files.
 func registerIDLs(r *server.Hertz) {
 	group := r.Group("/")
 	{
-		//group.Any("/:svc/:method", handler.Gateway)
 		group.Any("/:svc/*path", handler.Gateway)
 	}
 
 	handler.SvcMap = make(map[string]genericclient.Client)
-	//handler.PathToMethod = make(map[string]map[string]string)
 	handler.PathToMethod = make(map[string]map[handler.MethodPath]string)
 
 	idlPath := "../idl/"
@@ -44,12 +41,10 @@ func registerIDLs(r *server.Hertz) {
 		hlog.Errorf("new thrift file provider failed: %v", err)
 	}
 
-	// same resolver for all generic clients
 	if registerCenter.ErrResolver != nil {
 		hlog.Errorf("err: %v", err)
 	}
 
-	// generic clients creation
 	for _, entry := range c {
 
 		if entry.IsDir() || entry.Name() == "common.thrift" {
@@ -63,5 +58,14 @@ func registerIDLs(r *server.Hertz) {
 		}
 	}
 
-	go watchIDLs(idlPath)
+	// Create the error channel
+	errChannel := make(chan error)
+
+	go watchIDLs(idlPath, errChannel)
+
+	go func() {
+		for err := range errChannel {
+			hlog.Error(err)
+		}
+	}()
 }
