@@ -13,7 +13,7 @@ import (
 
 // opens the database and creates the table if it does not exist
 func OpenDatabase() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "sql6633525:ZBhNrcwRvd@tcp(sql6.freesqldatabase.com:3306)/sql6633525")
+	db, err := sql.Open("mysql", "sql6635221:tBf8YkXzVh@tcp(sql6.freesqldatabase.com:3306)/sql6635221")
 	if err != nil {
 		return nil, err
 	}
