@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+
 	database "github.com/cloudwego/api_gateway/kitex_server"
 	api "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/api"
 )
@@ -30,7 +31,7 @@ func (s *StudentApiImpl) InsertStudent(ctx context.Context, req *api.InsertStude
 	if exist {
 		return &api.InsertStudentResponse{
 			Ok:  false,
-			Msg: "the num exists in server 1",
+			Msg: "Student inserted already",
 		}, nil
 	}
 

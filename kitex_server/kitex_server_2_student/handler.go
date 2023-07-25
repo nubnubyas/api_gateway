@@ -15,11 +15,11 @@ func (s *StudentApiImpl) QueryStudent(ctx context.Context, req *api.QueryStudent
 	exist, _ := database.NumExists(req.Id)
 	if !exist {
 		return &api.QueryStudentResponse{
-			Msg: "Student does not exist in server 3",
+			Msg: "Student does not exist in server 2",
 		}, nil
 	} else {
 		resp, _ = database.QueryStudentDB(req.Id)
-		resp.Msg = "Student exist in server 3"
+		resp.Msg = "Student exist in server 2"
 		return resp, nil
 	}
 }
@@ -30,7 +30,7 @@ func (s *StudentApiImpl) InsertStudent(ctx context.Context, req *api.InsertStude
 	if exist {
 		return &api.InsertStudentResponse{
 			Ok:  false,
-			Msg: "the num has exists in server 3",
+			Msg: "Student inserted already",
 		}, nil
 	} else {
 		database.InsertStudentDB(req)
