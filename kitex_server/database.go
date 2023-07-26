@@ -11,9 +11,17 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// to config accordingly
+const username = "sql6635523"
+const password = "RQ4yfdNux4"
+const hostname = "sql6.freesqldatabase.com"
+const port = "3306"
+const dbname = "sql6635523"
+
 // opens the database and creates the table if it does not exist
 func OpenDatabase() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "sql6635221:tBf8YkXzVh@tcp(sql6.freesqldatabase.com:3306)/sql6635221")
+	serverName := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, hostname, port, dbname)
+	db, err := sql.Open("mysql", serverName)
 	if err != nil {
 		return nil, err
 	}
