@@ -5,7 +5,7 @@ package main
 import (
 	"time"
 
-	middleware "github.com/cloudwego/api_gateway/hertz_gateway/biz/middleware"
+	"github.com/cloudwego/api_gateway/hertz_gateway/biz/middleware"
 	"github.com/cloudwego/hertz/pkg/app/middlewares/server/basic_auth"
 	"github.com/cloudwego/hertz/pkg/app/server"
 
