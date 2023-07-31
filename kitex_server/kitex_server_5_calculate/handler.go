@@ -13,22 +13,6 @@ type CalculatorResp struct {
 	Message string `json:"message"`
 }
 
-func (s *CalculatorApiImpl) CapCalculate(ctx context.Context, req *calculator.CapCalculatorReq) (resp *calculator.CapCalculatorResp, err error) {
-	var result float64
-	gradesList := req.Num1
-
-	for _, grade := range gradesList {
-		result += grade
-	}
-
-	result /= float64(len(gradesList))
-
-	return &calculator.CapCalculatorResp{
-		Message: result,
-	}, nil
-
-}
-
 func (s *CalculatorApiImpl) Calculate(ctx context.Context, req *calculator.CalculatorReq) (resp *calculator.CalculatorResp, err error) {
 	var result int64
 
