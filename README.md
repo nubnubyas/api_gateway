@@ -57,7 +57,7 @@ This command can be used to manually updates the gateway after any IDL files are
 
 Here's an example of how to send a JSON-encoded HTTP request to the API Gateway using cURL:  
 
-```curl -X POST -H "Content-Type: application/json" -d '{"Num":"2","Name":"Ben","Gender":"Male"}' http://localhost:8080/student_api/insert```  
+```curl -X POST -H "Content-Type: application/json" -d '{"Num":"2","Name":"Ben","Gender":"Male"}' -u monday:mahjong http://localhost:8080/student_api/insert```  
 This command sends a POST request with a JSON-encoded body containing a num, name and gender field to the API Gateway server running on localhost at port 8080. 
 
 Reference our [Demo video](https://drive.google.com/file/d/1fzpVKpczA3NTpi2iYsOFELMmpU3IMR0v/view?usp=sharing) if needed 
