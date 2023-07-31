@@ -26,6 +26,7 @@ func (s *CalculatorApiImpl) CapCalculate(ctx context.Context, req *calculator.Ca
 	return &calculator.CapCalculatorResp{
 		Message: result,
 	}, nil
+
 }
 
 func (s *CalculatorApiImpl) Calculate(ctx context.Context, req *calculator.CalculatorReq) (resp *calculator.CalculatorResp, err error) {
