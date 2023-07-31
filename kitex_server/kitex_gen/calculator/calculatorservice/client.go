@@ -12,7 +12,6 @@ import (
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
 	Calculate(ctx context.Context, request *calculator.CalculatorReq, callOptions ...callopt.Option) (r *calculator.CalculatorResp, err error)
-	CapCalculate(ctx context.Context, request *calculator.CapCalculatorReq, callOptions ...callopt.Option) (r *calculator.CapCalculatorResp, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -47,9 +46,4 @@ type kCalculatorServiceClient struct {
 func (p *kCalculatorServiceClient) Calculate(ctx context.Context, request *calculator.CalculatorReq, callOptions ...callopt.Option) (r *calculator.CalculatorResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.Calculate(ctx, request)
-}
-
-func (p *kCalculatorServiceClient) CapCalculate(ctx context.Context, request *calculator.CapCalculatorReq, callOptions ...callopt.Option) (r *calculator.CapCalculatorResp, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.CapCalculate(ctx, request)
 }
