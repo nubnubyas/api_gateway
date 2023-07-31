@@ -3,8 +3,10 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	api "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/api"
+	grader "github.com/cloudwego/api_gateway/kitex_server/kitex_gen/grader"
 	"github.com/cloudwego/kitex/pkg/klog"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -61,6 +63,24 @@ func InsertStudentDB(student *api.InsertStudentRequest) error {
 	return nil
 }
 
+// includes sql command to insert a student
+func InsertGradesDB(req *grader.InsertGradeRequest) error {
+	db, err := OpenDatabase()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	gradeString := strings.Join(req.Grades, ",")
+	_, err = db.Exec("UPDATE students SET grades = ? WHERE num = ?", gradeString, fmt.Sprintf("%d", req.StudentId))
+	if err != nil {
+		klog.Errorf("Error inserting table: %v", err)
+		return err
+	}
+
+	return nil
+}
+
 // check if student exist
 func NumExists(num string) (bool, error) {
 	db, err := OpenDatabase()
@@ -95,4 +115,22 @@ func QueryStudentDB(num string) (*api.QueryStudentResponse, error) {
 	}
 
 	return &resp, nil
+}
+
+func GetGradesDB(id int) (*grader.GetCapResponse, string, error) {
+	db, err := OpenDatabase()
+	if err != nil {
+		return nil, "", err
+	}
+	defer db.Close()
+
+	var resp grader.GetCapResponse
+	var grades string
+	err = db.QueryRow("SELECT num, name, major, gender, grades FROM students WHERE num = ?", fmt.Sprintf("%d", id)).Scan(&resp.Id, &resp.Name, &resp.Major, &resp.Gender, &grades)
+	if err != nil {
+		klog.Errorf("Error getting student: %v", err)
+		return nil, "", err
+	}
+
+	return &resp, grades, nil
 }

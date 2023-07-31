@@ -19,7 +19,8 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "calculatorService"
 	handlerType := (*calculator.CalculatorService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"calculate": kitex.NewMethodInfo(calculateHandler, newCalculatorServiceCalculateArgs, newCalculatorServiceCalculateResult, false),
+		"calculate":    kitex.NewMethodInfo(calculateHandler, newCalculatorServiceCalculateArgs, newCalculatorServiceCalculateResult, false),
+		"capCalculate": kitex.NewMethodInfo(capCalculateHandler, newCalculatorServiceCapCalculateArgs, newCalculatorServiceCapCalculateResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "calculator",
@@ -53,6 +54,24 @@ func newCalculatorServiceCalculateResult() interface{} {
 	return calculator.NewCalculatorServiceCalculateResult()
 }
 
+func capCalculateHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*calculator.CalculatorServiceCapCalculateArgs)
+	realResult := result.(*calculator.CalculatorServiceCapCalculateResult)
+	success, err := handler.(calculator.CalculatorService).CapCalculate(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCalculatorServiceCapCalculateArgs() interface{} {
+	return calculator.NewCalculatorServiceCapCalculateArgs()
+}
+
+func newCalculatorServiceCapCalculateResult() interface{} {
+	return calculator.NewCalculatorServiceCapCalculateResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -68,6 +87,16 @@ func (p *kClient) Calculate(ctx context.Context, request *calculator.CalculatorR
 	_args.Request = request
 	var _result calculator.CalculatorServiceCalculateResult
 	if err = p.c.Call(ctx, "calculate", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) CapCalculate(ctx context.Context, request *calculator.CapCalculatorReq) (r *calculator.CapCalculatorResp, err error) {
+	var _args calculator.CalculatorServiceCapCalculateArgs
+	_args.Request = request
+	var _result calculator.CalculatorServiceCapCalculateResult
+	if err = p.c.Call(ctx, "capCalculate", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

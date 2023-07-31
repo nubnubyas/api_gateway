@@ -11,6 +11,15 @@ struct calculatorResp {
     1: string message
 }
 
+struct capCalculatorReq {
+    1: list<double> num1 (api.form="grades")
+}
+
+struct capCalculatorResp {
+    1: double message
+}
+
 service calculatorService {
     calculatorResp calculate(1: calculatorReq request)  (api.get="/calculatorService/get")
+    capCalculatorResp capCalculate(1: capCalculatorReq request) (api.post="/calculatorService/cap") 
 }
