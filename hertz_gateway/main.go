@@ -5,10 +5,9 @@ package main
 import (
 	"time"
 
-	"github.com/cloudwego/api_gateway/hertz_gateway/biz/middleware"
 	"github.com/cloudwego/hertz/pkg/app/middlewares/server/basic_auth"
-	"github.com/cloudwego/hertz/pkg/app/server"
 
+	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/cache"
 	"github.com/hertz-contrib/cache/persist"
 )
@@ -26,8 +25,6 @@ func main() {
 		"instagram?": "weibo!",
 		"whatsapp?":  "wechat!",
 	}))
-
-	h.Use(middleware.RateLimiter(100, time.Second*5))
 
 	// Cache middleware
 	memoryStore := persist.NewMemoryStore(1 * time.Minute)

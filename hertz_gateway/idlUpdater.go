@@ -155,10 +155,18 @@ func watchIDLs(idlPath string, errChan chan<- error) {
 					}
 				}
 
-				if event.Op&fsnotify.Rename == fsnotify.Rename || event.Op&fsnotify.Write == fsnotify.Write {
+				if event.Op&fsnotify.Rename == fsnotify.Rename {
 					name := strings.Split(event.Name, "\\")
 					select {
 					case changeChan <- []string{name[2], "rename"}:
+					default:
+					}
+				}
+
+				if event.Op&fsnotify.Write == fsnotify.Write {
+					name := strings.Split(event.Name, "\\")
+					select {
+					case changeChan <- []string{name[2], "write"}:
 					default:
 					}
 				}
@@ -178,6 +186,9 @@ func watchIDLs(idlPath string, errChan chan<- error) {
 			removeGenericClient(entry[0], idlPath)
 		case "rename":
 			removeGenericClient(entry[0], idlPath)
+		case "write":
+			removeGenericClient(entry[0], idlPath)
+			createGenericClient(entry[0], idlPath)
 		}
 	}
 }

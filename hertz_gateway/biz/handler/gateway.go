@@ -44,7 +44,7 @@ func Gateway(ctx context.Context, c *app.RequestContext) {
 	// verify the if request body is encoded in JSON (only if it is non-GET requests)
 	// GET requests do not have request body (uses query string instead)
 	if !checkJSON(reqBody) {
-		hlog.Error("JsonNotFound err")
+		hlog.Errorf("JsonNotFound err")
 		c.JSON(http.StatusNoContent, errors.New(common.Err_JsonNotFound))
 		return
 	}
