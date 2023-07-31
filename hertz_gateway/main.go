@@ -19,11 +19,7 @@ func main() {
 
 	// BasicAuth middleware
 	h.Use(basic_auth.BasicAuth(map[string]string{
-		"monday":     "mahjong",
-		"bytedance":  "internship",
-		"china":      "number1",
-		"instagram?": "weibo!",
-		"whatsapp?":  "wechat!",
+		"monday": "mahjong",
 	}))
 
 	// Cache middleware
